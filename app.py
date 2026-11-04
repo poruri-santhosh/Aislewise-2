@@ -146,79 +146,40 @@ def parse_positive_integer(value, name):
 
 
 # ============================================================
-# MLFLOW MODEL LOADING
+# SENTIMENT MODEL LOADING
 # ============================================================
 
 @lru_cache(maxsize=1)
-def load_registered_sentiment_model(
-    tracking_uri,
-    model_name
-):
+def load_sentiment_model():
 
     try:
-        import mlflow
-        from mlflow.tracking import MlflowClient
+        import joblib
 
     except ImportError as error:
         raise SentimentModelUnavailable(
-            "MLflow and the model dependencies are not installed."
+            "The sentiment model loader is not installed."
         ) from error
 
-    mlflow.set_tracking_uri(tracking_uri)
+    model_path = BASE_DIR / "models" / "sentiment_pipeline.pkl"
 
-    client = MlflowClient(
-        tracking_uri=tracking_uri
-    )
+    if not model_path.is_file():
+        raise SentimentModelUnavailable(
+            "The deployed sentiment model artifact is missing."
+        )
 
     try:
-
-        registered_model = client.get_registered_model(
-            model_name
-        )
-
-    except mlflow.exceptions.MlflowException as error:
-
+        model = joblib.load(model_path)
+    except (ImportError, OSError, ValueError) as error:
         raise SentimentModelUnavailable(
-            f"Registered sentiment model {model_name!r} "
-            "could not be found."
+            "The deployed sentiment model could not be loaded."
         ) from error
 
-    ready_versions = [
-        version
-        for version in registered_model.latest_versions
-        if version.status == "READY"
-    ]
-
-    if not ready_versions:
-
+    if not callable(getattr(model, "predict", None)):
         raise SentimentModelUnavailable(
-            f"Model {model_name!r} has no ready version."
+            "The deployed sentiment model does not support predictions."
         )
 
-    latest_version = max(
-        ready_versions,
-        key=lambda version: int(version.version)
-    )
-
-    try:
-
-        model = mlflow.sklearn.load_model(
-            f"models:/{model_name}/{latest_version.version}"
-        )
-
-        return model
-
-    except (
-        ImportError,
-        OSError,
-        ValueError,
-        mlflow.exceptions.MlflowException
-    ) as error:
-
-        raise SentimentModelUnavailable(
-            f"Registered sentiment model {model_name!r} "
-            "could not be loaded."
-        ) from error
+    return model
 
 
 # ============================================================
@@ -227,41 +188,7 @@ def load_registered_sentiment_model(
 
 def predict_shopper_sentiment(review_text):
 
-    tracking_uri = os.getenv(
-        "MLFLOW_TRACKING_URI",
-        ""
-    ).strip()
-
-    if not tracking_uri:
-
-        local_registry = BASE_DIR / "mlflow.db"
-
-        if not local_registry.is_file():
-
-            raise SentimentModelUnavailable(
-                "Set MLFLOW_TRACKING_URI to a reachable "
-                "MLflow model registry."
-            )
-
-        tracking_uri = (
-            f"sqlite:///{local_registry.as_posix()}"
-        )
-
-    model_name = os.getenv(
-        "MLFLOW_MODEL_NAME",
-        "Aislewise_Sentiment_Model"
-    ).strip()
-
-    if not model_name:
-
-        raise SentimentModelUnavailable(
-            "MLFLOW_MODEL_NAME must not be empty."
-        )
-
-    model = load_registered_sentiment_model(
-        tracking_uri,
-        model_name
-    )
+    model = load_sentiment_model()
 
     try:
 
@@ -277,7 +204,7 @@ def predict_shopper_sentiment(review_text):
     ) as error:
 
         raise SentimentModelUnavailable(
-            "The registered sentiment model could not "
+            "The deployed sentiment model could not "
             "evaluate this review."
         ) from error
 

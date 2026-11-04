@@ -77,7 +77,7 @@ flowchart LR
 
 | Path | Runtime behavior | Deployment |
 |---|---|---|
-| Website | Flask serves the product review catalogue and shopper feedback API; browser-only JavaScript plans in-store routes. | Vercel Python function from root `app.py`; configure PostgreSQL and MLflow. |
+| Website | Flask serves the product review catalogue and shopper feedback API; browser-only JavaScript plans in-store routes. | Vercel Python function from root `app.py`; configure PostgreSQL. |
 | Dashboard | Streamlit reads the checked-in `warehouse.duckdb` file. No PostgreSQL connection is required to view that snapshot. | Streamlit Community Cloud; app file `streamlit/app.py`. |
 
 `DATABASE_URL` is used by the website. `NEON_DATABASE_URL` is used by the PostgreSQL loader/sync and optional Bronze ingestion scripts. These are configuration names, not values to put in source control.
@@ -170,7 +170,7 @@ Aislewise/
 ├── run_analysis.py              # Portfolio summaries and overview chart
 ├── export_analysis.py           # Export selected summaries to CSV and JSON
 ├── organize_project.py          # Preview/apply root-level file organization
-├── requirements.txt             # Flask, Pandera, MLflow, and model dependencies
+├── requirements.txt             # Flask, Pandera, scikit-learn, and model dependencies
 ├── requirements-analysis.txt    # Data and analysis dependencies
 ├── requirements-dev.txt         # Test dependencies
 ├── vercel.json                  # Vercel Flask function settings
@@ -314,7 +314,7 @@ The website includes two client-side modes. **Product Intelligence** keeps the P
 
 Shopper feedback is stored separately from product reviews because it rates the in-store trip rather than an individual product. Before accepting feedback, create the `shopper_feedback` table by running `migrations/001_create_shopper_feedback.sql` in the PostgreSQL database. The application database role needs `SELECT` and `INSERT` access to that table. The submission API validates non-empty customer name and review text, integer rating 1–5, and non-negative dwell time with Pandera before running model inference or inserting a row.
 
-The submission endpoint loads the latest ready version of the registered `Aislewise_Sentiment_Model`. For local development, the app uses the project's `mlflow.db` when it exists. For a deployed app, configure `MLFLOW_TRACKING_URI` to a reachable MLflow registry with its model artifacts available, and optionally set `MLFLOW_MODEL_NAME`. The local `mlflow.db` and `mlruns/` artifacts are excluded from Git and Vercel uploads; they are not a production model registry. If PostgreSQL migration or MLflow configuration is missing, the feedback form shows an explicit error and does not report a successful save.
+The Vercel submission endpoint loads the exported scikit-learn pipeline at `models/sentiment_pipeline.pkl` with joblib. This keeps inference available without packaging the large MLflow runtime into the serverless function. Refresh this artifact from the latest registered `Aislewise_Sentiment_Model` before deploying a newly trained version. The local `mlflow.db` and `mlruns/` directories are excluded from Git and Vercel uploads. If the PostgreSQL migration is missing, the feedback form shows an explicit error and does not report a successful save.
 
 **Privacy:** submitted customer names and feedback text are visible in Product Intelligence. Make sure users are informed before they submit, and confirm the PostgreSQL, model-registry, and dataset access policies before publishing the site.
 
@@ -343,7 +343,7 @@ Before pushing, make sure `.env`, `.streamlit/secrets.toml`, `.vercel/`, `aislew
 5. Use the SSL-enabled PostgreSQL URL. Do not add a connection URL to `vercel.json` or commit it to GitHub.
 6. Deploy the project.
 
-Vercel detects the root `app.py` as the Flask app. Templates are included in the serverless function and assets under `public/` are served statically. Add both `DATABASE_URL` and `MLFLOW_TRACKING_URI` in Vercel project settings. The PostgreSQL migration must be applied before shopper feedback can be listed or submitted; the configured MLflow registry must contain a ready version of the sentiment model.
+Vercel detects the root `app.py` as the Flask app. Templates are included in the serverless function and assets under `public/` are served statically. Configure `DATABASE_URL` (or `NEON_DATABASE_URL`) in Vercel project settings. Apply `migrations/001_create_shopper_feedback.sql` to that PostgreSQL database before shopper feedback can be listed or submitted. The sentiment pipeline artifact is bundled from `models/sentiment_pipeline.pkl`.
 
 ### 3. Verify the Vercel deployment
 
