@@ -1,145 +1,149 @@
 # Aislewise
 
-## Product review intelligence
+**Product Review Intelligence** — a portfolio project for exploring customer feedback, finding gaps between star ratings and review sentiment, and inspecting product-level quality signals.
 
-Aislewise is a review-analysis project with two separate apps:
+Aislewise has two deliberately separate user-facing applications:
 
-1. A **Flask website** that searches and displays all product reviews stored in PostgreSQL.
-2. A **Streamlit dashboard** that explores review sentiment and product-quality scenarios from a DuckDB analytics file.
+- **Flask review website:** searches reviews and product metadata from PostgreSQL at request time.
+- **Streamlit analytics dashboard:** explores prepared review and scenario tables in a local DuckDB warehouse snapshot.
 
-The website and the dashboard use different data paths. The Flask website reads PostgreSQL when someone visits it. The Streamlit dashboard reads a local `warehouse.duckdb` snapshot. The dashboard does not connect to PostgreSQL by itself.
+The applications share the project’s review domain, but they do **not** share a live data connection. The Flask app queries PostgreSQL; the dashboard opens `warehouse.duckdb`. Dashboard refresh reruns queries against that DuckDB file—it does not synchronize PostgreSQL. This separation keeps the searchable website path independent from the analytics workflow and makes the checked-in snapshot usable without a database connection.
 
-> **Important: know what this project contains.** The current analytics snapshot has 50,000 review records, including review text and reviewer IDs. Check dataset permissions and privacy requirements before sharing this repository or dashboard publicly. Keeping a GitHub repository private does not automatically make a separately published dashboard private.
+> **Data and privacy:** The analytics snapshot contains review text and reviewer identifiers. Before sharing or deploying this repository, confirm the source dataset’s terms, privacy obligations, and whether the committed snapshot is appropriate for the intended audience. Never commit database credentials or private environment files.
 
-> **Project scope:** This repository analyzes product reviews. It does not currently implement an online store, shopping cart, wishlist, order management, real checkout, or payment processing. The commerce and sales features described in some sample project plans are not part of this application.
+> **Scope:** Aislewise analyzes product reviews. It is not an online store and does not provide carts, wishlists, order management, checkout, or payment processing. Scenario classifications are investigative signals, not verified claims about products or sellers.
 
-## What users can do
+## At a glance
+
+| Area | What it does | Data source |
+|---|---|---|
+| Review website | Search, filter, sort, and page through product reviews; display summary metrics | PostgreSQL (`products`, `reviews`) |
+| Analytics dashboard | Explore rating/sentiment scenarios, inspect reviews by product ID, export the Scenario C list | `warehouse.duckdb` |
+| Data generation | Stream a sample of UCSD Amazon Reviews 2023 data and match product metadata | Public compressed JSONL dataset |
+| Sync and analysis | Add new PostgreSQL reviews to DuckDB, classify sentiment, and build product-level analysis tables | PostgreSQL → DuckDB |
+| Optional Bronze ingestion | Copy PostgreSQL and MongoDB source data into raw DuckDB tables | PostgreSQL + MongoDB → `aislewise_warehouse.duckdb` |
+
+## Features
 
 ### Flask review website
 
-- View review and product counts, average rating, and verified-purchase percentage.
-- Search product IDs, product names, review titles, and review text.
-- Filter by star rating and verified-purchase status.
+- Summary endpoint reports review count, reviewed product count, average rating, and verified-review count.
+- Search across product IDs, product names, review titles, and review text.
+- Filter by product ID, star rating, and verified-purchase status.
 - Sort by newest, oldest, rating, or helpful votes.
-- Browse results 20, 50, or 100 reviews at a time.
+- Paginate results in pages of 20, 50, or 100 reviews.
+- Validate request values and use SQL parameters for user-provided search/filter values.
+- Expose `/health`, `/api/summary`, and `/api/reviews` endpoints alongside the HTML page.
 
 ### Streamlit analytics dashboard
 
-- View overall review and product counts.
-- Investigate Scenario A rating traps.
-- Investigate Scenario B hidden gems.
-- Review Scenario C low-rated products with many negative reviews.
-- Search for a product ID and inspect its customer reviews.
-- Download the Scenario C list as a CSV.
+- Show review/product totals and counts for the three product-quality scenarios.
+- Investigate **Scenario A: Rating traps**—high average star rating with a large share of negative review labels.
+- Investigate **Scenario B: Hidden gems**—low average star rating with a large share of positive review labels.
+- Investigate **Scenario C: Catalog lemons**—low average rating with a high share of negative review labels.
+- Inspect a product’s classification and customer reviews by product ID.
+- Download the Scenario C results as a CSV.
 
-## Architecture
+The dashboard reads DuckDB tables in read-only mode. Its optional 10-second rerun and manual refresh controls only re-read the current local snapshot.
+
+## System architecture
 
 ```mermaid
 flowchart LR
-    browser["Customer browser"] -->|HTML, CSS, JavaScript| website["Flask website"]
-    website -->|JSON API requests| website
-    website -->|Read-only SQL over TLS| postgres[("PostgreSQL")]
+    visitor["Visitor"] --> browser["Browser"]
+    browser -->|HTML request| flask["Flask app<br/>app.py"]
+    browser -->|JSON API request| flask
+    flask -->|Read-only SQL<br/>DATABASE_URL| postgres[("PostgreSQL<br/>products + reviews")]
+    flask -->|HTML / JSON| browser
 
-    postgres -->|New review batches| sync["incremental_sync.py"]
-    sync -->|Add sentiment and update summaries| warehouse[("warehouse.duckdb")]
-    warehouse --> analysis["Scenario and analysis scripts"]
-    warehouse --> dashboard["Streamlit dashboard"]
-    analysis -->|Reports, charts, CSV exports| outputs["Generated analysis files"]
+    postgres -->|New review batches<br/>NEON_DATABASE_URL| sync["incremental_sync.py"]
+    sync -->|Sentiment + aggregates| analytics[("warehouse.duckdb")]
+    analytics --> dashboard["Streamlit dashboard<br/>streamlit/app.py"]
+    dashboard -->|Read-only SQL| analytics
 
-    source["UCSD review and product data"] --> generate["dataset_generation.py"]
-    generate -->|CSV files| loader["load_to_postgres.py"]
-    loader --> postgres
-    generate -->|JSON Lines files| mongo_loader["load_to_mongodb.py"]
-    mongo_loader --> mongodb[("MongoDB, optional")]
-    postgres -->|Raw Bronze tables| bronze["ingest_to_duckdb.py"]
-    mongodb -->|Raw Bronze documents| bronze
-    bronze --> bronze_db[("aislewise_warehouse.duckdb")]
+    source["UCSD Reviews 2023<br/>compressed JSONL"] --> generator["dataset_generation.py"]
+    generator -->|CSV| pgload["load_to_postgres.py"]
+    pgload --> postgres
+    generator -->|JSONL| mongoload["load_to_mongodb.py<br/>(optional)"]
+    mongoload --> mongo[("MongoDB<br/>(optional)")]
+    postgres -.->|Raw source tables| bronze["ingest_to_duckdb.py<br/>(optional)"]
+    mongo -.->|Raw product details| bronze
+    bronze -.-> rawwarehouse[("aislewise_warehouse.duckdb<br/>Bronze only")]
 ```
 
-### How the website request works
+### Two data paths, two deployment targets
+
+| Path | Runtime behavior | Deployment |
+|---|---|---|
+| Website | Each request reaches Flask, which queries PostgreSQL and returns HTML or JSON. | Vercel Python function at `api/index.py`; configure `DATABASE_URL` in Vercel. |
+| Dashboard | Streamlit reads the checked-in `warehouse.duckdb` file. No PostgreSQL connection is required to view that snapshot. | Streamlit Community Cloud; app file `streamlit/app.py`. |
+
+`DATABASE_URL` is used by the website. `NEON_DATABASE_URL` is used by the PostgreSQL loader/sync and optional Bronze ingestion scripts. These are configuration names, not values to put in source control.
+
+## Data pipeline
+
+The main analytics path is an offline/periodic pipeline. The website can continue to serve PostgreSQL data independently of whether the analytics snapshot has been refreshed.
 
 ```mermaid
-sequenceDiagram
-    actor Visitor
-    participant Browser
-    participant Flask as Flask (app.py)
-    participant PostgreSQL
-
-    Visitor->>Browser: Open the website or change a filter
-    Browser->>Flask: GET /, /api/summary, or /api/reviews
-    Flask->>Flask: Validate page, rating, sort, and filter values
-    Flask->>PostgreSQL: Run parameterized SELECT queries
-    PostgreSQL-->>Flask: Return summary or one page of reviews
-    Flask-->>Browser: Return HTML or JSON
-    Browser-->>Visitor: Show review cards and page controls
+flowchart TD
+    A["UCSD review + product metadata JSONL.GZ"] --> B["dataset_generation.py<br/>stream and select up to 50,000 reviews"]
+    B --> C["Match product metadata<br/>to selected product IDs"]
+    C --> D["PostgreSQL CSV files"]
+    C --> E["MongoDB JSONL files<br/>(optional)"]
+    D --> F["load_to_postgres.py<br/>products first, then reviews"]
+    F --> G[("PostgreSQL source tables")]
+    G --> H["incremental_sync.py<br/>read new timestamp batches"]
+    H --> I["Rule-based sentiment label"]
+    I --> J[("DuckDB Silver: silver_reviews")]
+    J --> K["Product aggregates + A/B flags"]
+    K --> L[("DuckDB Gold scenario tables")]
+    L --> M["Analysis scripts + Streamlit dashboard"]
+    M --> N["Tables, charts, reports, CSV exports"]
 ```
 
-The Flask website only reads from PostgreSQL. It does not upload reviews or create, edit, or delete database records. Search values are passed as SQL parameters, and sort choices come from a fixed allowlist.
+### Pipeline stages
 
-## Technology
+1. **Generate sample inputs (optional).** `dataset_generation.py` streams the Appliances category review and metadata files from the UCSD Amazon Reviews 2023 dataset. It selects up to 50,000 reviews with text, finds matching products, and writes PostgreSQL CSVs and MongoDB JSONL files.
+2. **Load PostgreSQL (optional).** `load_to_postgres.py` creates the `products` and `reviews` tables and loads products before reviews. Review product IDs reference product rows. Do not assume rerunning the import is an upsert or reset operation.
+3. **Load MongoDB (optional).** `load_to_mongodb.py` loads product details and raw reviews. **Warning:** it drops its destination collections before loading; only use it with a disposable database or after backing up data.
+4. **Sync analytics reviews.** `incremental_sync.py` polls PostgreSQL in batches, uses a timestamp checkpoint, assigns each review a simple rule-based sentiment, inserts it into `silver_reviews`, and refreshes the product discrepancy aggregates and Scenario A/B flags in `warehouse.duckdb`.
+5. **Run analysis and inspect results.** Scenario scripts and analysis/export scripts use the DuckDB warehouse to produce additional scenario tables, investigations, and outputs. The Streamlit dashboard queries the prepared tables.
+6. **Optional Bronze copy.** `ingest_to_duckdb.py` copies raw PostgreSQL products/reviews and MongoDB product details into `aislewise_warehouse.duckdb`. This is a separate Bronze-ingestion database, not the dashboard warehouse, and it does not build the dashboard’s Silver/Gold tables.
 
-| Part | Technology | Purpose |
-|---|---|---|
-| Website | Flask and Python | Serve the page and review API |
-| Browser interface | HTML, CSS, JavaScript | Display reviews, filters, and pagination |
-| Website database | PostgreSQL | Store products and customer reviews |
-| Analytics database | DuckDB | Store the local analysis snapshot and derived tables |
-| Analytics interface | Streamlit | Explore the DuckDB review analysis |
-| Charts | Plotly, Matplotlib, and Seaborn | Display or export charts |
-| Website hosting | Vercel | Host the Flask website and API |
-| Dashboard hosting | Streamlit Community Cloud | Host the separate Streamlit app |
-| Source control and CI | GitHub and GitHub Actions | Store code and run automated tests |
+### Analytics layers
 
-## Review data and database tables
+- **Bronze (optional):** raw PostgreSQL and MongoDB data copied into `aislewise_warehouse.duckdb` for ingestion exercises.
+- **Silver:** review records with normalized fields and a derived `sentiment` label in `warehouse.duckdb`.
+- **Gold:** product-level summaries, discrepancy flags, and scenario-specific analysis tables consumed by the dashboard and reports.
 
-### PostgreSQL source tables
+The exact tables produced by analysis scripts can depend on which scripts have been run. The dashboard snapshot must contain the tables its panels query.
 
-`load_to_postgres.py` creates these tables if they do not already exist:
+## Scenario rules and sentiment
 
-| Table | What one row represents | Main fields |
-|---|---|---|
-| `products` | One product | `product_id`, `title`, `main_category`, `average_rating`, `rating_number`, `price`, `store` |
-| `reviews` | One customer review | `review_id`, `product_id`, `user_id`, `rating`, `title`, `text`, `timestamp`, `verified_purchase`, `helpful_vote` |
+The current rule thresholds are:
 
-Each `reviews.product_id` references `products.product_id`. Load product rows before review rows.
-
-The website reads from these PostgreSQL tables. Set `DATABASE_URL` for the Flask website. The existing ingestion and synchronization scripts use `NEON_DATABASE_URL`.
-
-### DuckDB analytics tables
-
-`warehouse.duckdb` is the dashboard's local snapshot. Its main tables include:
-
-| Table | What it contains |
+| Scenario | Investigative rule |
 |---|---|
-| `silver_reviews` | Review fields plus a rule-based `sentiment` value |
-| `gold_product_discrepancy_flags` | Per-product review counts, ratings, sentiment percentages, and Scenario A/B flags |
-| `gold_scenario_b_forensics` | Extra analysis of Scenario B products |
-| `gold_scenario_c_catalog_purge` | Products meeting the Scenario C criteria |
-| Other `gold_*` tables | Extra scenario, durability, complaint, and review-velocity results |
+| **A — Rating traps** | Average product rating ≥ 4.0 and negative review share ≥ 35%. |
+| **B — Hidden gems** | Average product rating ≤ 3.0 and positive review share ≥ 65%. |
+| **C — Catalog lemons** | Average product rating ≤ 2.5 and negative review share ≥ 60%. |
 
-The snapshot currently has **50,000 reviews** across **15,641 products**. In the current snapshot, sentiment counts are 41,343 positive, 7,054 negative, and 1,603 neutral. Snapshot counts describe the file included with the project; they can differ from live PostgreSQL counts.
+`incremental_sync.py` uses a small positive/negative keyword list together with star ratings to classify sentiment as positive, negative, or neutral. It is a lightweight heuristic—not a trained language model, aspect-based analysis, or a verified judgment of customer intent. Sarcasm, context, mixed feedback, and words used in different senses can produce incorrect labels. Review the underlying text before making a business decision.
 
-### Scenario rules
-
-The scenario scripts use these thresholds:
-
-- **Scenario A — Rating traps:** average product rating is at least 4.0, but at least 35% of the product's reviews are classified negative.
-- **Scenario B — Hidden gems:** average product rating is at most 3.0, while at least 65% of its reviews are classified positive.
-- **Scenario C — Catalog lemons:** average product rating is at most 2.5, while at least 60% of its reviews are classified negative.
-
-The sentiment classifier in `incremental_sync.py` uses a small word list and the star rating. It is a simple heuristic, not a trained language model or a verified judgment of customer intent. Read original reviews before making business decisions.
-
-## Project structure
+## Repository map
 
 ```text
 Aislewise/
 ├── app.py                       # Flask website, PostgreSQL connection, and JSON API
-├── public/
-│   └── static/
-│       ├── css/styles.css       # Website layout and responsive styles
-│       └── js/reviews.js        # Browser search, filters, and pagination
+├── api/
+│   └── index.py                 # Vercel Flask entry point
 ├── templates/
 │   └── index.html               # Website HTML
+├── static/
+│   ├── css/
+│   │   └── styles.css           # Website layout and responsive styles
+│   └── js/
+│       └── reviews.js           # Browser search, filters, and pagination
 ├── streamlit/
 │   ├── app.py                   # Streamlit review-analysis dashboard
 │   └── requirements.txt         # Dashboard dependencies
@@ -164,86 +168,116 @@ Aislewise/
 ├── requirements.txt             # Flask/Vercel dependencies
 ├── requirements-analysis.txt    # Data and analysis dependencies
 ├── requirements-dev.txt         # Test dependencies
-├── vercel.json                  # Vercel Flask function settings
+├── vercel.json                  # Vercel routing and Python function setup
 └── README.md
 ```
 
-## Data pipeline: from source reviews to analysis
+## Getting started locally
 
-```mermaid
-flowchart TD
-    source["UCSD review and product metadata files"] --> step1["1. Generate a local dataset"]
-    step1 --> csv["PostgreSQL CSV files"]
-    step1 --> jsonl["MongoDB JSON Lines files"]
-    csv --> step2["2. Load PostgreSQL products, then reviews"]
-    jsonl --> step3["3. Optionally load MongoDB product details and raw reviews"]
-    step2 --> pg[("PostgreSQL products and reviews")]
-    step3 --> mongo[("MongoDB collections")]
-    pg --> step4["4. Sync new reviews to the DuckDB analytics warehouse"]
-    step4 --> silver["Silver reviews and rule-based sentiment"]
-    silver --> gold["Gold product flags and scenario tables"]
-    gold --> step5["5. Run reports and the Streamlit dashboard"]
+### Requirements
+
+- Python 3.10+ (CI currently tests with Python 3.12).
+- PostgreSQL for the Flask website and PostgreSQL ingestion/sync scripts.
+- `warehouse.duckdb` at the repository root for the dashboard. It is included in this repository’s snapshot workflow.
+- MongoDB only if you intend to run the optional MongoDB load or Bronze-ingestion steps.
+
+### 1. Clone and create a virtual environment
+
+```bash
+git clone https://github.com/poruri-santhosh/Aislewise-2.git
+cd Aislewise-2
+python -m venv .venv
 ```
 
-### Step 1: Generate input files (optional)
+Activate it:
 
-`dataset_generation.py` downloads a set of reviews and matching product metadata from the configured public dataset URLs. It writes CSV files under `data_postgresql/` and JSON Lines files under `data_mongodb/`.
+```bash
+# macOS / Linux
+source .venv/bin/activate
 
-Run this only if you intend to fetch a new dataset:
+# Windows PowerShell
+.venv\Scripts\Activate.ps1
+```
 
-```powershell
+If PowerShell blocks activation, use `.venv\Scripts\python.exe` directly.
+
+### 2. Install dependencies
+
+For the Flask website:
+
+```bash
+python -m pip install -r requirements.txt
+```
+
+For analysis, dashboard, and tests:
+
+```bash
+python -m pip install -r requirements-analysis.txt -r requirements-dev.txt -r streamlit/requirements.txt
+```
+
+### 3. Configure PostgreSQL (website and data scripts)
+
+Create a local `.env` file in the project root (do not commit it):
+
+```dotenv
+DATABASE_URL=postgresql://USER:PASSWORD@HOST:5432/DATABASE
+NEON_DATABASE_URL=postgresql://USER:PASSWORD@HOST:5432/DATABASE
+```
+
+Use the SSL-enabled URL supplied by your PostgreSQL provider. The website defaults to SSL for non-local hosts; `DATABASE_SSLMODE` can override that behavior. The website accepts `DATABASE_URL` or, as a fallback, `NEON_DATABASE_URL`. Never paste real credentials into this README, source code, or a public issue.
+
+### 4. Start the website
+
+```bash
+python app.py
+```
+
+Open <http://127.0.0.1:5000>. Useful endpoints:
+
+| URL | Purpose |
+|---|---|
+| `/` | Review search website |
+| `/health` | Check PostgreSQL connectivity |
+| `/api/summary` | Summary counts and average rating |
+| `/api/reviews?page=1&page_size=20` | First review page |
+| `/api/reviews?q=ice&rating=5` | Search text and filter to five stars |
+
+The HTML can load while the database is unavailable; database-backed endpoints return an error until configuration and source tables are ready.
+
+### 5. Start the dashboard
+
+From the repository root, in another terminal:
+
+```bash
+python -m streamlit run streamlit/app.py
+```
+
+The dashboard opens in your browser and reads `warehouse.duckdb`. It does not need PostgreSQL to display the checked-in snapshot.
+
+## Optional: create or refresh the data
+
+Run data-loading steps only when you intend to create or change data. They are not required to run the website against an existing PostgreSQL database or view the existing dashboard snapshot.
+
+```bash
+# Generate CSV/JSONL inputs from the public dataset
 python dataset_generation.py
-```
 
-The command needs an internet connection and can take time. It generates local input data; it does not deploy the website.
-
-### Step 2: Load PostgreSQL (optional)
-
-`load_to_postgres.py` creates the `products` and `reviews` tables if needed, imports products first, then copies review records in batches, and prints database counts.
-
-```powershell
+# Load PostgreSQL products and reviews (verify target database first)
 python load_to_postgres.py
-```
 
-It reads `data_postgresql/products_table.csv` and `data_postgresql/reviews_table.csv` and uses `NEON_DATABASE_URL`.
-
-> **Do not blindly rerun the PostgreSQL loader on an already-populated database.** It does not provide an upsert/reset workflow for existing primary keys. Confirm the target database and decide how to handle existing rows before loading again.
-
-### Step 3: Load MongoDB (optional)
-
-`load_to_mongodb.py` loads the generated JSON Lines files and creates indexes:
-
-```powershell
+# Optional MongoDB load (destination collections are dropped before import)
 python load_to_mongodb.py
-```
 
-> **Destructive action:** the current MongoDB loader drops its `product_details` and `raw_reviews` collections before it imports data. Use it only with a disposable development database or after you have a verified backup. MongoDB is not required by the Flask website or Streamlit dashboard.
-
-### Step 4: Copy source rows to Bronze tables (optional)
-
-`ingest_to_duckdb.py` reads PostgreSQL and MongoDB and writes raw Bronze tables into a separate file named `aislewise_warehouse.duckdb`:
-
-```powershell
+# Optional raw Bronze copy; needs PostgreSQL and MongoDB configuration
 python ingest_to_duckdb.py
-```
 
-This is not the analytics database used by `streamlit/app.py`. It requires both database connections and does not create the Silver and Gold dashboard tables.
-
-### Step 5: Sync reviews into the analytics warehouse
-
-`incremental_sync.py` connects to PostgreSQL using `NEON_DATABASE_URL`, reads new review batches, adds a rule-based sentiment label, and updates DuckDB Silver/Gold review tables.
-
-```powershell
+# Incrementally sync PostgreSQL reviews to warehouse.duckdb; runs continuously
 python incremental_sync.py
 ```
 
-This script runs continuously until stopped with `Ctrl+C`. It writes to `warehouse.duckdb` in the current working directory. Stop it before copying or replacing that database file.
+`incremental_sync.py` polls every 10 seconds when no new rows are found. Stop it with `Ctrl+C` before copying or replacing `warehouse.duckdb`. Once its required DuckDB inputs exist, run the analysis scripts from the repository root:
 
-### Step 6: Run analysis and export results
-
-Run these scripts from the project root and only after their required DuckDB tables exist:
-
-```powershell
+```bash
 python run_analysis.py
 python deep_investigation_suite.py
 python Scenario_A/scenario_a_trap_products.py
@@ -253,89 +287,13 @@ python Scenario_C/scenario_c_audit.py
 python export_analysis.py
 ```
 
-They print analysis results and can update DuckDB analysis tables or generate reports and charts in the scenario folders. `export_analysis.py` writes summary CSV and JSON files into `analytics_exports/`. These are local analysis steps, not required to run the Flask website.
+Scripts can update DuckDB tables and create reports/charts/exports. Check each script’s output and the generated files before publishing refreshed artifacts.
 
-## Run locally on Windows
+## Deployment
 
-### 1. Open a terminal in the project root
+### Flask website on Vercel
 
-```powershell
-cd C:\path\to\Aislewise
-```
-
-### 2. Create and activate a Python environment
-
-```powershell
-python -m venv .venv
-.\.venv\Scripts\Activate.ps1
-```
-
-If PowerShell prevents environment activation, either allow local scripts according to your organization's policy or run `.venv\Scripts\python.exe` directly in the commands below.
-
-### 3. Install dependencies
-
-For just the Flask website:
-
-```powershell
-python -m pip install -r requirements.txt
-```
-
-For the website, analytics scripts, Streamlit dashboard, and tests:
-
-```powershell
-python -m pip install -r requirements-analysis.txt -r requirements-dev.txt -r streamlit/requirements.txt
-```
-
-### 4. Configure the local PostgreSQL connection
-
-Copy the example environment file and add your own connection URLs:
-
-```powershell
-Copy-Item .env.example .env
-```
-
-Set these values inside your local, untracked `.env` file:
-
-```dotenv
-DATABASE_URL=your-postgresql-connection-url
-NEON_DATABASE_URL=your-postgresql-connection-url
-```
-
-`DATABASE_URL` is used by the website. `NEON_DATABASE_URL` is used by the existing PostgreSQL loader and DuckDB sync script. For a hosted PostgreSQL service, use its SSL-enabled connection string. Never paste a real connection URL into README, source code, or a public GitHub repository.
-
-### 5. Start the Flask review website
-
-```powershell
-python app.py
-```
-
-Open <http://127.0.0.1:5000>. To stop the local server, press `Ctrl+C`.
-
-Useful URLs:
-
-| URL | Result |
-|---|---|
-| `http://127.0.0.1:5000/` | Review website |
-| `http://127.0.0.1:5000/health` | PostgreSQL connectivity check |
-| `http://127.0.0.1:5000/api/summary` | Review and product totals |
-| `http://127.0.0.1:5000/api/reviews?page=1&page_size=20` | First page of reviews |
-| `http://127.0.0.1:5000/api/reviews?q=ice&rating=5` | Search for “ice” and filter to five stars |
-
-If the page loads but the counts fail, check `/health`, the `.env` URLs, network access, and that both PostgreSQL tables exist.
-
-### 6. Start the Streamlit dashboard
-
-Open a second terminal in the project root and run:
-
-```powershell
-python -m streamlit run streamlit/app.py
-```
-
-Streamlit opens its local dashboard URL in a browser. The dashboard reads `warehouse.duckdb` from the project root and does not need the PostgreSQL connection to display its saved snapshot.
-
-## Deploy the Flask website to Vercel
-
-Vercel hosts the **Flask website and API only**. It does not run the Streamlit dashboard or use the local DuckDB snapshot for website requests.
+Vercel serves the Flask website/API only; it does not host the Streamlit dashboard or read the local DuckDB snapshot for website requests.
 
 ### 1. Push the project to GitHub
 
@@ -362,9 +320,7 @@ Before pushing, make sure `.env`, `.streamlit/secrets.toml`, `.vercel/`, `aislew
 5. Use the SSL-enabled PostgreSQL URL. Do not add a connection URL to `vercel.json` or commit it to GitHub.
 6. Deploy the project.
 
-Vercel detects the root `app.py` as the Flask application. The templates are included with the serverless function, and files under `public/` are served as static assets. The Flask app also serves those same assets locally from `public/static/`.
-
-For a deployment straight from your local computer instead of GitHub, open PowerShell in the project root and run `npx vercel login`, then `npx vercel link`, then `npx vercel`. Sign in through the browser opened by the CLI; do not paste an access token into chat or put it in a source file. The `.vercelignore` file prevents local credentials, DuckDB files, and generated datasets from being uploaded by the CLI. After linking, set `DATABASE_URL` in that Vercel project's Environment Variables before testing the deployed review API.
+`vercel.json` points Vercel to `api/index.py`. The Python function loads `app.py` and uses the included HTML template, CSS, and JavaScript files.
 
 ### 3. Verify the Vercel deployment
 
@@ -376,61 +332,36 @@ After deployment, visit:
 
 The website uses serverless requests. It does not require the local DuckDB files.
 
-## Deploy the Streamlit dashboard to Community Cloud
+### Streamlit Community Cloud
 
-The Streamlit dashboard is a separate deployment from Vercel:
+1. Connect the repository in Streamlit Community Cloud.
+2. Select branch `main` and app file `streamlit/app.py`.
+3. Deploy with `warehouse.duckdb` included in the repository.
 
-1. Push the project to GitHub and confirm the repository includes `warehouse.duckdb`.
-2. In Streamlit Community Cloud, choose **Create app** and connect the repository.
-3. Select branch `main`.
-4. Set the app file to `streamlit/app.py`.
-5. Deploy the app.
+The dashboard uses `streamlit/requirements.txt` and `.streamlit/config.toml`. Updating its data means refreshing the DuckDB snapshot, testing it, then committing and deploying that snapshot. A dashboard rerun alone does not fetch PostgreSQL data.
 
-Community Cloud finds the dashboard's dependencies in `streamlit/requirements.txt` and the shared theme in `.streamlit/config.toml`. The Streamlit app uses the checked-in DuckDB snapshot, so it does not require `DATABASE_URL` to display the snapshot.
+## Tests and continuous integration
 
-> **Snapshot update:** Streamlit reads the committed database file, not live PostgreSQL. To update the dashboard data, refresh `warehouse.duckdb` locally, run the tests, and commit/push the updated file. A public Streamlit app can expose data in that snapshot to its viewers.
+GitHub Actions runs the test suite on pushes and pull requests using Python 3.12:
 
-## GitHub Actions and tests
-
-`.github/workflows/tests.yml` runs tests for pushes and pull requests.
-
-Run the same tests locally:
-
-```powershell
+```bash
 python -m pip install -r requirements-dev.txt -r streamlit/requirements.txt
 python -m pytest -q
 ```
 
-The tests cover:
+Tests cover the website, static assets, API behavior and filtering/pagination, invalid input and missing database configuration, and dashboard startup. Live PostgreSQL checks are skipped when the relevant database URL is not configured. Do not add production database credentials to CI unless you intentionally want tests to access that database.
 
-- Flask homepage and static assets.
-- Summary and review API behavior.
-- Search, product, rating, verified-purchase, sorting, and pagination filters.
-- Clear errors for invalid input or missing database configuration.
-- Streamlit dashboard startup using `warehouse.duckdb`.
-- Live PostgreSQL connectivity and read-only review checks when a database URL is configured.
+## Operational notes and limitations
 
-The live PostgreSQL test is skipped when `DATABASE_URL` and `NEON_DATABASE_URL` are not set. Do not add database credentials to GitHub Actions unless you intentionally want it to connect to a real database.
+- PostgreSQL website data and the committed DuckDB dashboard snapshot can be at different points in time.
+- The dashboard refresh controls re-query the local snapshot; they do not sync PostgreSQL into DuckDB.
+- The incremental sync uses a timestamp checkpoint and is intended as a simple project pipeline, not a fully managed production CDC system.
+- The sentiment classifier is a heuristic and scenario flags can be false positives or false negatives.
+- Re-running the initial PostgreSQL import is not a general-purpose upsert/reset process; inspect the target before loading.
+- The MongoDB loader drops target collections before import. Back up or use a disposable database.
+- The optional Bronze database is distinct from the analytics warehouse used by Streamlit.
+- Treat recommendations, supplier notices, and catalog lists as review leads that require human verification.
 
-## Common problems
+## License and dataset
 
-| Problem | Check |
-|---|---|
-| `python app.py` exits immediately | Run the command from the project folder and check that `app.py` contains the direct-run entry point. |
-| Website says PostgreSQL is unavailable | Check `.env`, `DATABASE_URL`, the SSL setting, network access, and the PostgreSQL tables. |
-| Review counts fail but the homepage opens | The HTML can load without database access; check `/health`. |
-| Streamlit says the DuckDB file is missing | Start Streamlit from the repository root and make sure `warehouse.duckdb` exists there. |
-| Scenario script reports a missing table | Run the data/sync steps needed to build its DuckDB inputs first. |
-| Vercel page opens but API returns 503 | Add `DATABASE_URL` in the Vercel project settings and redeploy. |
-| MongoDB data unexpectedly disappeared | The MongoDB loader drops target collections before loading; restore from backup and do not rerun it against important data. |
-
-## Known limitations
-
-- Website review data is read from live PostgreSQL; dashboard analysis uses a separate, committed DuckDB snapshot.
-- Streamlit's refresh control reruns the dashboard but does not synchronize PostgreSQL into DuckDB.
-- The sentiment labels use simple rating and keyword rules and can be wrong.
-- Re-running the initial PostgreSQL import is not an automatic upsert operation.
-- The MongoDB loader currently drops its destination collections before import.
-- Scenario recommendations are investigative signals; validate the original reviews before acting.
-#   A i s l e w i s e - 2  
- 
+Review the repository’s license and the UCSD Amazon Reviews 2023 dataset terms before reusing or redistributing the code or review data. The presence of data in this repository does not establish that it may be republished for every purpose.
