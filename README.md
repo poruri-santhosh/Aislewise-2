@@ -424,7 +424,7 @@ The live PostgreSQL test is skipped when `DATABASE_URL` and `NEON_DATABASE_URL` 
 | Scenario script reports a missing table | Run the data/sync steps needed to build its DuckDB inputs first. |
 | Vercel page opens but API returns 503 | Add `DATABASE_URL` in the Vercel project settings and redeploy. |
 | MongoDB data unexpectedly disappeared | The MongoDB loader drops target collections before loading; restore from backup and do not rerun it against important data. |
-
+ 
 ## Known limitations
 
 - Website review data is read from live PostgreSQL; dashboard analysis uses a separate, committed DuckDB snapshot.
@@ -433,5 +433,6 @@ The live PostgreSQL test is skipped when `DATABASE_URL` and `NEON_DATABASE_URL` 
 - Re-running the initial PostgreSQL import is not an automatic upsert operation.
 - The MongoDB loader currently drops its destination collections before import.
 - Scenario recommendations are investigative signals; validate the original reviews before acting.
-#   A i s l e w i s e - 2  
+#   A i s l e w i s e - 2 
+ 
  
