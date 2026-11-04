@@ -1,12 +1,12 @@
   # Aislewise
 
-## Product review intelligence
+## Product review intelligence[](url)
 
 Aislewise is a review-analysis project with two separate apps:
 
 1. A **Flask website** that searches and displays all product reviews stored in PostgreSQL.
 2. A **Streamlit dashboard** that explores review sentiment and product-quality scenarios from a DuckDB analytics file.
-
+(url)
 The website and the dashboard use different data paths. The Flask website reads PostgreSQL when someone visits it. The Streamlit dashboard reads a local `warehouse.duckdb` snapshot. The dashboard does not connect to PostgreSQL by itself.
 
 > **Important: know what this project contains.** The current analytics snapshot has 50,000 review records, including review text and reviewer IDs. Check dataset permissions and privacy requirements before sharing this repository or dashboard publicly. Keeping a GitHub repository private does not automatically make a separately published dashboard private.
