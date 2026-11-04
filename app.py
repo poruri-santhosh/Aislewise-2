@@ -48,13 +48,12 @@ class SentimentModelUnavailable(RuntimeError):
 def database_connection():
 
     database_url = (
-        os.getenv("DATABASE_URL")
-        or os.getenv("NEON_DATABASE_URL")
+      os.getenv("NEON_DATABASE_URL")
     )
 
     if not database_url:
         raise DatabaseConfigurationError(
-            "Set DATABASE_URL or NEON_DATABASE_URL in your .env file."
+            "Set NEON_DATABASE_URL in your .env file."
         )
 
     try:
