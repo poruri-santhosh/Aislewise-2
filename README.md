@@ -134,15 +134,12 @@ The sentiment classifier in `incremental_sync.py` uses a small word list and the
 ```text
 Aislewise/
 ├── app.py                       # Flask website, PostgreSQL connection, and JSON API
-├── api/
-│   └── index.py                 # Vercel Flask entry point
+├── public/
+│   └── static/
+│       ├── css/styles.css       # Website layout and responsive styles
+│       └── js/reviews.js        # Browser search, filters, and pagination
 ├── templates/
 │   └── index.html               # Website HTML
-├── static/
-│   ├── css/
-│   │   └── styles.css           # Website layout and responsive styles
-│   └── js/
-│       └── reviews.js           # Browser search, filters, and pagination
 ├── streamlit/
 │   ├── app.py                   # Streamlit review-analysis dashboard
 │   └── requirements.txt         # Dashboard dependencies
@@ -167,7 +164,7 @@ Aislewise/
 ├── requirements.txt             # Flask/Vercel dependencies
 ├── requirements-analysis.txt    # Data and analysis dependencies
 ├── requirements-dev.txt         # Test dependencies
-├── vercel.json                  # Vercel routing and Python function setup
+├── vercel.json                  # Vercel Flask function settings
 └── README.md
 ```
 
@@ -365,7 +362,9 @@ Before pushing, make sure `.env`, `.streamlit/secrets.toml`, `.vercel/`, `aislew
 5. Use the SSL-enabled PostgreSQL URL. Do not add a connection URL to `vercel.json` or commit it to GitHub.
 6. Deploy the project.
 
-`vercel.json` points Vercel to `api/index.py`. The Python function loads `app.py` and uses the included HTML template, CSS, and JavaScript files.
+Vercel detects the root `app.py` as the Flask application. The templates are included with the serverless function, and files under `public/` are served as static assets. The Flask app also serves those same assets locally from `public/static/`.
+
+For a deployment straight from your local computer instead of GitHub, open PowerShell in the project root and run `npx vercel login`, then `npx vercel link`, then `npx vercel`. Sign in through the browser opened by the CLI; do not paste an access token into chat or put it in a source file. The `.vercelignore` file prevents local credentials, DuckDB files, and generated datasets from being uploaded by the CLI. After linking, set `DATABASE_URL` in that Vercel project's Environment Variables before testing the deployed review API.
 
 ### 3. Verify the Vercel deployment
 
