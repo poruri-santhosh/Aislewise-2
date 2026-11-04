@@ -1,231 +1,147 @@
-"""
-Aislewise Sentiment Tracker – Production Training Pipeline
-==========================================================
-Loads labeled review data directly from warehouse.duckdb (silver_reviews).
-
-Labeling strategy:
-  rating >= 4.0  →  positive  (label 1)
-  rating <= 2.0  →  negative  (label 0)
-  rating == 3.0  →  excluded  (noisy neutral class)
-
-Split: stratified 80 / 20 (train / test)
-Model: TF-IDF (unigrams+bigrams) + Logistic Regression
-Artifacts: confusion matrix PNG, trained sklearn pipeline
-Registry: Aislewise_Sentiment_Model (latest version updated)
-"""
 import os
-import tempfile
-from pathlib import Path
-
 import duckdb
-import matplotlib
-matplotlib.use("Agg")          # non-interactive backend – safe in all environments
-import matplotlib.pyplot as plt
-import mlflow
-import mlflow.sklearn
-import numpy as np
 import pandas as pd
-from mlflow.models import infer_signature
+import joblib
+from sklearn.model_selection import train_test_split
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.linear_model import LogisticRegression
-from sklearn.metrics import (
-    ConfusionMatrixDisplay,
-    accuracy_score,
-    confusion_matrix,
-    f1_score,
-    precision_score,
-    recall_score,
-)
-from sklearn.model_selection import train_test_split
 from sklearn.pipeline import Pipeline
+from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, confusion_matrix
+import mlflow
+import mlflow.sklearn
 
+DUCKDB_PATH = "warehouse.duckdb"
+MLFLOW_TRACKING_URI = "sqlite:///mlflow.db"
+MODEL_REGISTRY_NAME = "Aislewise_Sentiment_Model"
 
-# ── 1. Configuration ────────────────────────────────────────────────────────
+def run_training_pipeline():
+    print("=" * 65)
+    print(" AISLEWISE SENTIMENT MODEL - NATIVE FAST TRAINING & REGISTRATION ")
+    print("=" * 65)
 
-PROJECT_ROOT = Path(__file__).resolve().parent
-WAREHOUSE_PATH = PROJECT_ROOT / "warehouse.duckdb"
-MODEL_NAME = "Aislewise_Sentiment_Model"
+    # 1. Load Data from DuckDB
+    print("\n[1/5] Loading labeled review dataset from DuckDB...")
+    if not os.path.exists(DUCKDB_PATH):
+        raise FileNotFoundError(f"Database not found at {DUCKDB_PATH}")
 
-PARAMS = {
-    "max_features": 5000,
-    "ngram_range": (1, 2),
-    "C": 1.0,
-    "solver": "liblinear",
-    "max_iter": 1000,
-    "class_weight": "balanced",
-    "test_size": 0.20,
-    "random_state": 42,
-    "min_text_length": 10,   # characters – filters blank / trivially short texts
-}
-
-print("=" * 65)
-print(" AISLEWISE SENTIMENT MODEL – PRODUCTION RETRAINING ")
-print("=" * 65)
-
-
-# ── 2. Load labeled data from warehouse.duckdb ───────────────────────────────
-
-print(f"\n[1/6] Loading silver_reviews from {WAREHOUSE_PATH.name} …")
-if not WAREHOUSE_PATH.is_file():
-    raise FileNotFoundError(
-        f"warehouse.duckdb not found at {WAREHOUSE_PATH}. "
-        "Run incremental_sync.py first to populate the warehouse."
-    )
-
-con = duckdb.connect(str(WAREHOUSE_PATH), read_only=True)
-df_raw = con.execute(
+    con = duckdb.connect(DUCKDB_PATH, read_only=True)
+    query = """
+        SELECT 
+            text AS review_text,
+            CASE WHEN rating >= 4.0 THEN 1 ELSE 0 END AS label
+        FROM silver_reviews
+        WHERE text IS NOT NULL AND length(text) >= 10
     """
-    SELECT
-        COALESCE(text, '') AS review_text,
-        rating
-    FROM silver_reviews
-    WHERE rating IS NOT NULL
-      AND (rating >= 4.0 OR rating <= 2.0)
-    """
-).df()
-con.close()
+    df = con.execute(query).df()
+    con.close()
 
-# Assign binary labels
-df_raw["label"] = (df_raw["rating"] >= 4.0).astype(int)  # 1 = positive, 0 = negative
+    total_samples = len(df)
+    pos_samples = (df["label"] == 1).sum()
+    neg_samples = (df["label"] == 0).sum()
+    print(f"  * Total Samples Loaded : {total_samples:,}")
+    print(f"  * Positive Samples (1) : {pos_samples:,} ({pos_samples/total_samples*100:.1f}%)")
+    print(f"  * Negative Samples (0) : {neg_samples:,} ({neg_samples/total_samples*100:.1f}%)")
 
-# Remove trivially short texts (noise)
-df_raw = df_raw[df_raw["review_text"].str.strip().str.len() >= PARAMS["min_text_length"]]
-
-total = len(df_raw)
-pos = int(df_raw["label"].sum())
-neg = total - pos
-print(f"    Labeled rows loaded : {total:,}")
-print(f"    Positive (label=1)  : {pos:,}  ({pos/total:.1%})")
-print(f"    Negative (label=0)  : {neg:,}  ({neg/total:.1%})")
-
-if total < 20:
-    raise ValueError(
-        f"Too few labeled reviews ({total}) to train a meaningful model. "
-        "Populate silver_reviews with at least 20 rated reviews."
+    # 2. Train / Test Split
+    print("\n[2/5] Performing Stratified Train/Test Split (80/20)...")
+    X_train, X_test, y_train, y_test = train_test_split(
+        df["review_text"],
+        df["label"],
+        test_size=0.20,
+        random_state=42,
+        stratify=df["label"]
     )
+    print(f"  * Train set: {len(X_train):,} samples")
+    print(f"  * Test set : {len(X_test):,} samples")
 
+    # 3. Model Pipeline Definition & Fitting
+    print("\n[3/5] Fitting TF-IDF Vectorizer + Logistic Regression...")
+    pipeline = Pipeline([
+        ("tfidf", TfidfVectorizer(
+            max_features=5000,
+            ngram_range=(1, 2),
+            sublinear_tf=True
+        )),
+        ("clf", LogisticRegression(
+            class_weight="balanced",
+            max_iter=1000,
+            solver="liblinear",
+            random_state=42
+        ))
+    ])
+    pipeline.fit(X_train, y_train)
 
-# ── 3. Stratified 80/20 train/test split ────────────────────────────────────
+    # 4. Evaluation
+    print("\n[4/5] Evaluating performance on held-out test data...")
+    y_pred = pipeline.predict(X_test)
+    acc = accuracy_score(y_test, y_pred)
+    prec = precision_score(y_test, y_pred)
+    rec = recall_score(y_test, y_pred)
+    f1 = f1_score(y_test, y_pred)
+    cm = confusion_matrix(y_test, y_pred)
 
-print("\n[2/6] Splitting data (stratified 80/20) …")
-X_train, X_test, y_train, y_test = train_test_split(
-    df_raw["review_text"],
-    df_raw["label"],
-    test_size=PARAMS["test_size"],
-    random_state=PARAMS["random_state"],
-    stratify=df_raw["label"],
-)
-print(f"    Train : {len(X_train):,} samples")
-print(f"    Test  : {len(X_test):,} samples")
+    print(f"  * Accuracy  : {acc:.4f}")
+    print(f"  * Precision : {prec:.4f}")
+    print(f"  * Recall    : {rec:.4f}")
+    print(f"  * F1-Score  : {f1:.4f}")
+    print("  * Confusion Matrix:")
+    print(cm)
 
+    # 5. Local Artifact Dump & Fast MLflow Logging
+    print("\n[5/5] Saving Native Model Artifacts...")
+    os.makedirs("models", exist_ok=True)
+    local_pkl_path = os.path.join("models", "sentiment_pipeline.pkl")
+    joblib.dump(pipeline, local_pkl_path)
+    print(f"  * Saved local artifact to: {local_pkl_path}")
 
-# ── 4. Build and train pipeline ─────────────────────────────────────────────
+    # Log to MLflow with EXPLICIT dependencies (prevents Windows file scanning hang)
+    mlflow.set_tracking_uri(MLFLOW_TRACKING_URI)
+    mlflow.set_experiment("Aislewise_Review_Intelligence")
 
-print("\n[3/6] Training TF-IDF + Logistic Regression pipeline …")
-pipeline = Pipeline(
-    [
-        (
-            "tfidf",
-            TfidfVectorizer(
-                max_features=PARAMS["max_features"],
-                ngram_range=PARAMS["ngram_range"],
-                sublinear_tf=True,
-                strip_accents="unicode",
-                analyzer="word",
-                token_pattern=r"\b[a-zA-Z]{2,}\b",
-            ),
-        ),
-        (
-            "classifier",
-            LogisticRegression(
-                C=PARAMS["C"],
-                solver=PARAMS["solver"],
-                max_iter=PARAMS["max_iter"],
-                class_weight=PARAMS["class_weight"],
-                random_state=PARAMS["random_state"],
-            ),
-        ),
-    ]
-)
-pipeline.fit(X_train, y_train)
+    with mlflow.start_run() as run:
+        # Log Metrics & Parameters
+        mlflow.log_params({
+            "max_features": 5000,
+            "ngram_range": "(1, 2)",
+            "class_weight": "balanced",
+            "solver": "liblinear"
+        })
+        mlflow.log_metrics({
+            "accuracy": acc,
+            "precision": prec,
+            "recall": rec,
+            "f1_score": f1
+        })
 
-
-# ── 5. Evaluate ─────────────────────────────────────────────────────────────
-
-print("\n[4/6] Evaluating on held-out test set …")
-y_pred = pipeline.predict(X_test)
-
-acc  = accuracy_score(y_test, y_pred)
-f1   = f1_score(y_test, y_pred, average="weighted", zero_division=0)
-prec = precision_score(y_test, y_pred, average="weighted", zero_division=0)
-rec  = recall_score(y_test, y_pred, average="weighted", zero_division=0)
-cm   = confusion_matrix(y_test, y_pred)
-
-print(f"    Accuracy  : {acc:.4f}")
-print(f"    Precision : {prec:.4f}")
-print(f"    Recall    : {rec:.4f}")
-print(f"    F1-Score  : {f1:.4f}")
-print(f"    Confusion Matrix:\n{cm}")
-
-
-# ── 6. Log to MLflow & register model ───────────────────────────────────────
-
-print("\n[5/6] Logging run and registering model in MLflow …")
-
-# Use local mlflow.db if no tracking URI set
-local_registry = PROJECT_ROOT / "mlflow.db"
-tracking_uri = os.getenv("MLFLOW_TRACKING_URI", "").strip()
-if not tracking_uri and local_registry.is_file():
-    tracking_uri = f"sqlite:///{local_registry.as_posix()}"
-if tracking_uri:
-    mlflow.set_tracking_uri(tracking_uri)
-
-mlflow.set_experiment("Aislewise_Sentiment_Analysis")
-
-# Log hyperparams with serialisable values
-loggable_params = dict(PARAMS)
-loggable_params["ngram_range"] = str(PARAMS["ngram_range"])
-
-with mlflow.start_run(run_name="LogisticRegression_TFIDF_RealData"):
-    mlflow.log_params(loggable_params)
-
-    mlflow.log_metric("accuracy",  acc)
-    mlflow.log_metric("f1_score",  f1)
-    mlflow.log_metric("precision", prec)
-    mlflow.log_metric("recall",    rec)
-    mlflow.log_metric("train_samples", len(X_train))
-    mlflow.log_metric("test_samples",  len(X_test))
-    mlflow.log_metric("positive_ratio", pos / total)
-
-    # Confusion matrix artifact
-    with tempfile.TemporaryDirectory() as tmp_dir:
-        fig, ax = plt.subplots(figsize=(5, 4))
-        disp = ConfusionMatrixDisplay(
-            confusion_matrix=cm,
-            display_labels=["Negative (0)", "Positive (1)"],
+        # By passing pip_requirements explicitly, MLflow skips inspecting system metadata
+        mlflow.sklearn.log_model(
+            sk_model=pipeline,
+            artifact_path="model",
+            registered_model_name=MODEL_REGISTRY_NAME,
+            pip_requirements=[
+                "scikit-learn>=1.6.0",
+                "pandas>=2.0.0",
+                "numpy>=1.24.0"
+            ]
         )
-        disp.plot(ax=ax, colorbar=False, cmap="Blues")
-        ax.set_title("Confusion Matrix – Aislewise_Sentiment_Model", fontsize=11)
-        plt.tight_layout()
-        cm_path = os.path.join(tmp_dir, "confusion_matrix.png")
-        plt.savefig(cm_path, dpi=150, bbox_inches="tight")
-        plt.close(fig)
-        mlflow.log_artifact(cm_path, artifact_path="evaluation")
+        print(f"  * MLflow Run logged successfully! Run ID: {run.info.run_id}")
 
-    # Infer signature from real data
-    signature = infer_signature(X_train, pipeline.predict(X_train))
+    # Final Verification
+    print("\n" + "=" * 65)
+    print(" VERIFICATION: INFERENCE SMOKE TEST ")
+    print("=" * 65)
+    test_cases = [
+        "Excellent product. I absolutely love it!",
+        "The product is okay, nothing special.",
+        "Very poor quality. Completely disappointed and broke on first day."
+    ]
+    for text in test_cases:
+        pred_label = pipeline.predict([text])[0]
+        label_text = "POSITIVE (1)" if pred_label == 1 else "NEGATIVE (0)"
+        print(f"  Input: \"{text}\"")
+        print(f"  Result: {label_text}\n")
 
-    mlflow.sklearn.log_model(
-        sk_model=pipeline,
-        artifact_path="sentiment_pipeline_model",
-        registered_model_name=MODEL_NAME,
-        signature=signature,
-        input_example=X_train.iloc[:3].tolist(),
-    )
+    print("Retraining & Registration Completed Successfully!")
 
-print(f"\n[6/6] Done.")
-print(f"    Model registered as : {MODEL_NAME}")
-print(f"    Accuracy  : {acc:.4f}")
-print(f"    F1-Score  : {f1:.4f}")
-print("=" * 65)
-print("Run `mlflow ui --backend-store-uri sqlite:///mlflow.db` to inspect.")
+if __name__ == "__main__":
+    run_training_pipeline()

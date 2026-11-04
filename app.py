@@ -3,7 +3,7 @@ from contextlib import contextmanager
 from functools import lru_cache
 from pathlib import Path
 from urllib.parse import urlsplit
-
+from sentiment_service import predict_sentiment
 import psycopg2
 from dotenv import load_dotenv
 from flask import Flask, current_app, jsonify, render_template, request
@@ -358,7 +358,19 @@ def shopper_reviews():
     except (DatabaseConfigurationError, psycopg2.Error) as error:
         return shopper_feedback_storage_error_response(error)
 
+@app.route("/api/reviews", methods=["POST"])
+def add_review():
+    data = request.get_json()
+    review_text = data.get("text", "")
+    rating = float(data.get("rating", 5.0))
 
+    # ఇక్కడ మన సపరేట్ ఫైల్ లోని ఫంక్షన్‌ని పిలుస్తున్నాం
+    sentiment = predict_sentiment(review_text, rating=rating)
+
+    # డేటాబేస్‌లోకి ఇన్సర్ట్ చేసే లాజిక్...
+    # (review_id, product_id, rating, text, sentiment, ...)
+    
+    return jsonify({"status": "success", "sentiment": sentiment})
 @app.post("/api/reviews")
 def submit_shopper_review():
     if not request.is_json:

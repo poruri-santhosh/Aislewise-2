@@ -8,15 +8,16 @@ import pandas as pd
 import plotly.express as px
 import streamlit as st
 from streamlit_autorefresh import st_autorefresh
+import sys
+from pathlib import Path
+
+sys.path.append(str(Path(__file__).resolve().parent.parent))
+from sentiment_service import predict_sentiment
 
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
-
-DUCKDB_PATH = os.path.normpath(
-    os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "warehouse.duckdb")
-)
 
 from Scenario_A.scenario_mlflow import (  # noqa: E402
     infer_review_sentiment,
@@ -26,7 +27,7 @@ from Scenario_A.scenario_mlflow import (  # noqa: E402
 )
 
 WAREHOUSE_PATH = Path(
-    os.getenv("AISLEWISE_WAREHOUSE_PATH", DUCKDB_PATH)
+    os.getenv("AISLEWISE_WAREHOUSE_PATH", str(PROJECT_ROOT / "warehouse.duckdb"))
 ).resolve()
 
 SCENARIO_IMAGE_FILES = {
@@ -68,7 +69,7 @@ st.markdown(
             border-right: 1px solid #334155 !important;
         }
         [data-testid="stSidebar"] label, [data-testid="stSidebar"] span, [data-testid="stSidebar"] p {
-            color: #F8FAFC !important;
+            color: #F1F5F9 !important;
             font-weight: 500;
         }
 
@@ -303,11 +304,8 @@ def apply_bright_plot_style(fig):
 
 
 def render_dashboard():
-    if not os.path.exists(WAREHOUSE_PATH):
-        st.error(
-            f"DuckDB warehouse not found: {WAREHOUSE_PATH}. "
-            "Ensure warehouse.duckdb is committed at the repository root."
-        )
+    if not WAREHOUSE_PATH.is_file():
+        st.error(f"Database not found: {WAREHOUSE_PATH}")
         st.stop()
 
     st.sidebar.title("⚡ Control Panel")
@@ -318,12 +316,22 @@ def render_dashboard():
         st.rerun()
 
     try:
-        model = load_sentiment_model()
+        import joblib
+        from pathlib import Path
+
+        model_file = Path(__file__).resolve().parent.parent / "models" / "sentiment_pipeline.pkl"
+        if not model_file.exists():
+            model_file = Path("models/sentiment_pipeline.pkl")
+
+        model = joblib.load(str(model_file))
+        classifier = getattr(model, "named_steps", {}).get("clf")
+        if classifier is not None and not hasattr(classifier, "multi_class"):
+            classifier.multi_class = "auto"
+
         scored_reviews = get_ml_scored_reviews(str(WAREHOUSE_PATH), model)
     except Exception as error:
         st.error(
             "Could not load the AI model or read reviews. "
-            "Please verify MLflow is running and the model is ready. "
             f"Details: {error}"
         )
         st.stop()
