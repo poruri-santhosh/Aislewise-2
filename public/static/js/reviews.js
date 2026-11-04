@@ -612,7 +612,7 @@ checkoutForm.addEventListener("submit", async (event) => {
   };
 
   try {
-    const response = await fetch("/api/reviews", {
+    const response = await fetch("/api/shopper-reviews", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
