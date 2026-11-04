@@ -1,0 +1,48 @@
+================================================================================
+                    OFFICIAL VENDOR QUALITY AUDIT NOTICE
+               Aislewise Automated Marketplace Intelligence System
+================================================================================
+DATE: November 04, 2026
+RECIPIENT: Quality Assurance & Product Operations (Supplier of ASIN: B07JJQR94P)
+PRODUCT TITLE: Magic Chef MCPMCUF3W2 MCUF3W2 Freezer, 3.0 cu. ft, White
+ASIN / SKU: B07JJQR94P
+AUDIT CLASSIFICATION: CRITICAL RATING DISCREPANCY (SCENARIO A - TRAP LISTING)
+ACTION REQUIRED: CORRECTIVE ACTION PLAN (CAP) WITHIN 14 BUSINESS DAYS
+================================================================================
+
+1. EXECUTIVE AUDIT SUMMARY
+--------------------------
+Our algorithmic monitoring detected an acute discrepancy between your public
+star rating and authentic post-purchase customer feedback:
+  * Public Marketplace Rating  : ⭐ 4.00 / 5.00 (Deceptively High)
+  * Analyzed Negative Reviews   : 🔴 100.0% (1 recorded severe failures)
+  * Customer Dissatisfaction Upvotes : 74 helpful votes from other buyers
+  * Dominant Root-Cause Driver  : [CORE QUALITY & DEFECT]
+
+CONCLUSION: Your public star rating does not reflect recent manufacturing quality. 
+Initial ratings mask ongoing durability degradation.
+
+2. VERIFIED CUSTOMER COMPLAINT EVIDENCE (FORENSIC LOG)
+------------------------------------------------------
+  [EVIDENCE RECORD #1]
+    - Assigned Stars : ⭐ 4.0 / 5.0 (Verified Buyer: False)
+    - Other Buyers Upvoted : 74 Helpful Votes
+    - Subject Line   : "UPDATED: and the bad, that the coils frost SO VERY VERY QUICKLY ..."
+    - Ground Truth Statement:
+      "UPDATED 4 years later:  As I bought this and wrote the review in 2015, and it is now June 28 of 2019, I thought it seriously deserved an UPDATE, and I probably ought to upgrade the stars from 4 to 5, for this reason (but I'll hold off and hope I haven't jinxed us by sharing this news) Tada--this freezer is STILL GOING STRONG!  Although the coils do frost up fairly quickly, it is very easy to defrost.  I moved it over to my son's area over a year ago and he uses it as his main freezer and it doesn't seem to frost up any worse than when used infrequently--END UPDATE.<br /><br />Okay, as nobody has reviewed this I will go ahead and review even though I've only had it a short time.  Bought this, from the competition wally for just 180 (went down to 160 and they gave me the difference back) and will write a review there also, with the same two pics.  I'm showing you the great--how SURPRISINGLY ROOMY IT IS, and the bad, that the coils frost SO VERY VERY QUICKLY without even opening the thing a normal amount of use.<br /><br />This is a back up freezer bought for grown son who eats a lot of frozen dishes.  I told him, WHEN his refrigerator freezer is almost empty, to come get everything out of this one in ONE TRIP, as it is cheaply made and shouldn't be opened frequently. (I'm actually afraid it won't stand up JUST BECAUSE it is small and mini fridges never last long,  so we plan to treat it with kid-gloves.)<br /><br />AS YOU CAN SEE FROM PICS, frosted coils without using a normal amount of time.  Maybe simply because of the &#34;start up&#34; aspect, empty freezer first time cooling down?  I dunno, that is why I'll keep you updated. (and why I've saved the box and won't throw it out till 90 days passes-the return period)  If all goes well you will see an update in about six months, if not, you will see an update sooner.<br /><br />Only gave it 3 starts because that is AVERAGE and with the frosting issue and not knowing if it WILL stand up to time, how can I possibly rate it better?  If it holds up a year and the frosting issue doesn't get worse, I'll upgrade the stars.<br /><br />OH&#60;--it makes lots of funky noises, which is no big deal to me, but funny to see people's faces when they are in the kitchen and hear it and don't know what it is.  If you have a dog, you might think he is whining when it is actually the freezer.  Definitely not a freezer for a bedroom, lol.  Not sure if pics took or not, don't see a preview image there, we'll see.  Finally got the pics to upload.  Have had it for about a month now.<br /><br />UPDATE:  Still working.  Thought it died on me when I allowed it to build up too much ice (and that happens really easily as we seldom open it and you'd think that would discourage ice build up.) But it got hot and started thawing everything.  I emptied it, defrosted, and working great again.<br /><br />UPDATE: FEB 2017  Freezer is still working.  We rarely open it, other than to check that all is well--we switched to using this to store bell peppers grown in my garden, etc.  I don't think it is frosting up as quickly and I raised my star value to FOUR stars as it is still working and the frost issue isn't worse, anyway."
+--------------------------------------------------------------------------------
+
+3. MANDATORY CORRECTIVE ACTIONS
+-------------------------------
+To maintain active listing eligibility on the catalog, you must submit:
+  [ ] Batch Material Testing Certificate addressing [Core Quality & Defect].
+  [ ] Dimension / Fitment Verification Report ensuring accurate specification.
+  [ ] Remediation roadmap for inventory manufactured after recent quality decay.
+
+Failure to respond within 14 business days will result in automated de-ranking 
+and permanent placement under the "Misleading Quality Trap" quarantine segment.
+
+ISSUED BY:
+Aislewise Product Integrity & Discrepancy Forensic Engine
+Contact: integrity-ops@aislewise.internal
+================================================================================

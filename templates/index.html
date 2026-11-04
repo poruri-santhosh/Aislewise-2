@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#f5f7f4">
+    <meta name="description" content="Search and explore every Aislewise customer product review.">
+    <title>Aislewise | Customer Review Intelligence</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <script src="{{ url_for('static', filename='js/reviews.js') }}" defer></script>
+  </head>
+  <body>
+    <header class="topbar">
+      <a class="brand" href="/" aria-label="Aislewise home">
+        <span class="brand-mark" aria-hidden="true">A</span>
+        <span>aislewise<span class="brand-period">.</span></span>
+      </a>
+      <div class="topbar-status"><span class="status-dot"></span> PRODUCT INTELLIGENCE</div>
+    </header>
+
+    <main class="page-shell">
+      <section class="hero">
+        <p class="eyebrow">CUSTOMER VOICE, MADE CLEAR</p>
+        <h1>Every review.<br><span>One clear view.</span></h1>
+        <p class="hero-copy">Explore the complete product review catalogue. Search review text, find a product, and filter by rating or verified purchase.</p>
+      </section>
+
+      <section class="metrics" aria-label="Review catalogue summary">
+        <article class="metric-card">
+          <span class="metric-label">CUSTOMER REVIEWS</span>
+          <strong id="metric-reviews" class="metric-value">—</strong>
+          <span class="metric-note">Complete PostgreSQL catalogue</span>
+        </article>
+        <article class="metric-card">
+          <span class="metric-label">PRODUCTS REVIEWED</span>
+          <strong id="metric-products" class="metric-value">—</strong>
+          <span class="metric-note">Distinct products in the catalogue</span>
+        </article>
+        <article class="metric-card">
+          <span class="metric-label">AVERAGE RATING</span>
+          <strong id="metric-rating" class="metric-value">—</strong>
+          <span class="metric-note">Out of 5 customer stars</span>
+        </article>
+        <article class="metric-card">
+          <span class="metric-label">VERIFIED PURCHASES</span>
+          <strong id="metric-verified" class="metric-value">—</strong>
+          <span class="metric-note">Confirmed purchase reviews</span>
+        </article>
+      </section>
+
+      <section class="catalog" aria-labelledby="catalog-title">
+        <div class="catalog-heading">
+          <div>
+            <p class="eyebrow">THE FULL CATALOGUE</p>
+            <h2 id="catalog-title">Customer reviews</h2>
+          </div>
+          <span id="results-count" class="results-count" aria-live="polite">Loading reviews…</span>
+        </div>
+
+        <form id="filters" class="filters">
+          <label class="search-field">
+            <span class="sr-only">Search reviews</span>
+            <span class="search-icon" aria-hidden="true">⌕</span>
+            <input id="search" name="q" type="search" placeholder="Search reviews, products, or ASIN…" maxlength="120">
+          </label>
+          <label class="filter-field">
+            <span class="sr-only">Filter by rating</span>
+            <select id="rating" name="rating">
+              <option value="">All ratings</option>
+              <option value="5">5 stars</option>
+              <option value="4">4 stars</option>
+              <option value="3">3 stars</option>
+              <option value="2">2 stars</option>
+              <option value="1">1 star</option>
+            </select>
+          </label>
+          <label class="filter-field">
+            <span class="sr-only">Purchase verification</span>
+            <select id="verified" name="verified">
+              <option value="">All purchases</option>
+              <option value="true">Verified purchase</option>
+              <option value="false">Not verified</option>
+            </select>
+          </label>
+          <label class="filter-field">
+            <span class="sr-only">Sort reviews</span>
+            <select id="sort" name="sort">
+              <option value="newest">Newest first</option>
+              <option value="oldest">Oldest first</option>
+              <option value="rating_high">Highest rating</option>
+              <option value="rating_low">Lowest rating</option>
+              <option value="helpful">Most helpful</option>
+            </select>
+          </label>
+          <label class="filter-field page-size-field">
+            <span class="sr-only">Reviews per page</span>
+            <select id="page-size" name="page_size">
+              <option value="20">20 / page</option>
+              <option value="50">50 / page</option>
+              <option value="100">100 / page</option>
+            </select>
+          </label>
+        </form>
+
+        <div id="error-message" class="error-message" role="alert" hidden></div>
+        <div id="review-list" class="review-list" aria-live="polite" aria-busy="true"></div>
+        <nav class="pagination" aria-label="Review pages">
+          <span id="page-status" class="page-status">Page 1 of 1</span>
+          <div class="page-actions">
+            <button id="previous-page" class="page-button" type="button" disabled>← Previous</button>
+            <button id="next-page" class="page-button page-button-next" type="button" disabled>Next →</button>
+          </div>
+        </nav>
+      </section>
+
+      <footer class="footer">
+        <span>© <span id="year"></span> Aislewise</span>
+        <span>Review records are loaded directly from PostgreSQL.</span>
+      </footer>
+    </main>
+  </body>
+</html>

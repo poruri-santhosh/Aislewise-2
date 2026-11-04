@@ -1,0 +1,17 @@
+.env
+.env.*
+!.env.example
+.vercel/
+.streamlit/secrets.toml
+__pycache__/
+.pytest_cache/
+.venv/
+venv/
+*.py[cod]
+*.duckdb
+*.duckdb.wal
+!warehouse.duckdb
+data_postgresql/
+data_mongodb/
+analytics_exports/
+*.log

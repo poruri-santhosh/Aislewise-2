@@ -1,0 +1,89 @@
+================================================================================
+        AISLEWISE RECOVERY ACTION PLAN: SCENARIO B (HIDDEN GEMS)        
+================================================================================
+EXECUTIVE SUMMARY:
+  * Total Underrated Items Evaluated : 174
+  * Primary Bottleneck                : Sample Size Bias (98.9% under-reviewed)
+  * Remediation Target                : Bring suppressed listings back to >= 4.0 Stars
+================================================================================
+
+RANK #1 | PRODUCT ID: B01DKC2GQ0
+  - Title                    : HiLetgo 5pcs DHT11 Temperature Humidity Sensor Module Digital Temperature Humidity Sensor 3.3V-5V Humidity Measure Range 20%-95% Temperature Measure Range 0-50℃ Celsius with Dupont Wires
+  - Current Score            : ⭐ 3.00 / 5.0 (Artificially Suppressed)
+  - Authentic Positive Share : 🟢 100.0% (0 Happy Buyers)
+  - Diagnostic Reason        : Sample Size Truncation (Under-reviewed)
+  - Required 5-Star Reviews  : 🎯 ONLY 2 additional reviews needed
+  - Action Roadmap           : Deploy review request emails to verified purchasers.
+--------------------------------------------------------------------------------
+RANK #2 | PRODUCT ID: B00Q9EJ45S
+  - Title                    : 4yourhome 4 Pack Plastic Chrome Color Generic Oven Knob 1 5/8 Inch Diameter With Adapters 3/16 to 5/16 Inch
+  - Current Score            : ⭐ 3.00 / 5.0 (Artificially Suppressed)
+  - Authentic Positive Share : 🟢 100.0% (0 Happy Buyers)
+  - Diagnostic Reason        : Sample Size Truncation (Under-reviewed)
+  - Required 5-Star Reviews  : 🎯 ONLY 2 additional reviews needed
+  - Action Roadmap           : Deploy review request emails to verified purchasers.
+--------------------------------------------------------------------------------
+RANK #3 | PRODUCT ID: B0C8TR1SWY
+  - Title                    : Vita-Mix 15758 On Off Switch OEM Part
+  - Current Score            : ⭐ 3.00 / 5.0 (Artificially Suppressed)
+  - Authentic Positive Share : 🟢 100.0% (0 Happy Buyers)
+  - Diagnostic Reason        : Sample Size Truncation (Under-reviewed)
+  - Required 5-Star Reviews  : 🎯 ONLY 2 additional reviews needed
+  - Action Roadmap           : Deploy review request emails to verified purchasers.
+--------------------------------------------------------------------------------
+RANK #4 | PRODUCT ID: B095RGB1WT
+  - Title                    : Counter Ice Maker Machine, Make 26lbs Ice in 24 Hours Ice Maker Countertop, 9 Cubes in 7mins Ice Maker Machine with LED Display, Ice Scoop and Basket for Home/Bar/RV
+  - Current Score            : ⭐ 3.00 / 5.0 (Artificially Suppressed)
+  - Authentic Positive Share : 🟢 100.0% (0 Happy Buyers)
+  - Diagnostic Reason        : Sample Size Truncation (Under-reviewed)
+  - Required 5-Star Reviews  : 🎯 ONLY 1 additional reviews needed
+  - Action Roadmap           : Deploy review request emails to verified purchasers.
+--------------------------------------------------------------------------------
+RANK #5 | PRODUCT ID: B09PL5HHQJ
+  - Title                    : Qielie Egg Drawer for Refrigerator 32 Grid Large Capacity Egg Holder for Refrigerator Double Layer Egg Storage Meal Fresh Container (Drawer Type)
+  - Current Score            : ⭐ 3.00 / 5.0 (Artificially Suppressed)
+  - Authentic Positive Share : 🟢 100.0% (0 Happy Buyers)
+  - Diagnostic Reason        : Sample Size Truncation (Under-reviewed)
+  - Required 5-Star Reviews  : 🎯 ONLY 1 additional reviews needed
+  - Action Roadmap           : Deploy review request emails to verified purchasers.
+--------------------------------------------------------------------------------
+RANK #6 | PRODUCT ID: B079JPQFNB
+  - Title                    : Samsung DA97-13718C Refrigerator Ice Maker Assembly
+  - Current Score            : ⭐ 3.00 / 5.0 (Artificially Suppressed)
+  - Authentic Positive Share : 🟢 100.0% (0 Happy Buyers)
+  - Diagnostic Reason        : Sample Size Truncation (Under-reviewed)
+  - Required 5-Star Reviews  : 🎯 ONLY 1 additional reviews needed
+  - Action Roadmap           : Deploy review request emails to verified purchasers.
+--------------------------------------------------------------------------------
+RANK #7 | PRODUCT ID: B00VCWTH4K
+  - Title                    : Kitchen Aid KSGB900ESS 6.5 Cu. Ft. Slide-In Stainless Steel Gas Range KSGB900ESS
+  - Current Score            : ⭐ 3.00 / 5.0 (Artificially Suppressed)
+  - Authentic Positive Share : 🟢 100.0% (0 Happy Buyers)
+  - Diagnostic Reason        : Sample Size Truncation (Under-reviewed)
+  - Required 5-Star Reviews  : 🎯 ONLY 1 additional reviews needed
+  - Action Roadmap           : Deploy review request emails to verified purchasers.
+--------------------------------------------------------------------------------
+RANK #8 | PRODUCT ID: B07SQ7TK58
+  - Title                    : Lint Filter Case For DC61-02610A Samsung Dryer DV40J3000EW/A2 DV456ETHDSU AP4578784, 2069511, PS4206806, B00D6MDHNG
+  - Current Score            : ⭐ 3.00 / 5.0 (Artificially Suppressed)
+  - Authentic Positive Share : 🟢 100.0% (0 Happy Buyers)
+  - Diagnostic Reason        : Sample Size Truncation (Under-reviewed)
+  - Required 5-Star Reviews  : 🎯 ONLY 1 additional reviews needed
+  - Action Roadmap           : Deploy review request emails to verified purchasers.
+--------------------------------------------------------------------------------
+RANK #9 | PRODUCT ID: B07D5HPDVP
+  - Title                    : Supplying Demand 5301EL1001A 5301EL1001J Clothes Dryer Heater Assembly Replacement Model Specific Not Universal
+  - Current Score            : ⭐ 3.00 / 5.0 (Artificially Suppressed)
+  - Authentic Positive Share : 🟢 100.0% (0 Happy Buyers)
+  - Diagnostic Reason        : Sample Size Truncation (Under-reviewed)
+  - Required 5-Star Reviews  : 🎯 ONLY 1 additional reviews needed
+  - Action Roadmap           : Deploy review request emails to verified purchasers.
+--------------------------------------------------------------------------------
+RANK #10 | PRODUCT ID: B097Z77R79
+  - Title                    : FAMCO Galvanized Steel Hooded Wall Vent With Damper, Dryer Vent Outlet Used For Air Exhaust Applications
+  - Current Score            : ⭐ 3.00 / 5.0 (Artificially Suppressed)
+  - Authentic Positive Share : 🟢 100.0% (0 Happy Buyers)
+  - Diagnostic Reason        : Sample Size Truncation (Under-reviewed)
+  - Required 5-Star Reviews  : 🎯 ONLY 1 additional reviews needed
+  - Action Roadmap           : Deploy review request emails to verified purchasers.
+--------------------------------------------------------------------------------

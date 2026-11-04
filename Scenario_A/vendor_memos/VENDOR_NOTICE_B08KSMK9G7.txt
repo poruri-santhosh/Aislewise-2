@@ -1,0 +1,48 @@
+================================================================================
+                    OFFICIAL VENDOR QUALITY AUDIT NOTICE
+               Aislewise Automated Marketplace Intelligence System
+================================================================================
+DATE: November 04, 2026
+RECIPIENT: Quality Assurance & Product Operations (Supplier of ASIN: B08KSMK9G7)
+PRODUCT TITLE: SAMSUNG RF28T5001SR 28 Cu. Ft. Stainless Large Capacity French Door Refrigerator
+ASIN / SKU: B08KSMK9G7
+AUDIT CLASSIFICATION: CRITICAL RATING DISCREPANCY (SCENARIO A - TRAP LISTING)
+ACTION REQUIRED: CORRECTIVE ACTION PLAN (CAP) WITHIN 14 BUSINESS DAYS
+================================================================================
+
+1. EXECUTIVE AUDIT SUMMARY
+--------------------------
+Our algorithmic monitoring detected an acute discrepancy between your public
+star rating and authentic post-purchase customer feedback:
+  * Public Marketplace Rating  : ⭐ 5.00 / 5.00 (Deceptively High)
+  * Analyzed Negative Reviews   : 🔴 100.0% (1 recorded severe failures)
+  * Customer Dissatisfaction Upvotes : 38 helpful votes from other buyers
+  * Dominant Root-Cause Driver  : [CORE QUALITY & DEFECT]
+
+CONCLUSION: Your public star rating does not reflect recent manufacturing quality. 
+Initial ratings mask ongoing durability degradation.
+
+2. VERIFIED CUSTOMER COMPLAINT EVIDENCE (FORENSIC LOG)
+------------------------------------------------------
+  [EVIDENCE RECORD #1]
+    - Assigned Stars : ⭐ 5.0 / 5.0 (Verified Buyer: False)
+    - Other Buyers Upvoted : 38 Helpful Votes
+    - Subject Line   : "SAMSUNG RF28T5001SR 28 Cu. Ft. S/S Refrigerator With Ice Maker Inside Freezer Drawer"
+    - Ground Truth Statement:
+      "UPDATE: PLEASE NOTE MOST NEGATIVE REVIEWS ARE INTENDED FOR  (Certain) UNITS WITH WATER/ICE DISPENSERS ON  THE DOOR. This unit only has the ice dispenser in the freezer compartment. I just bought this Samsung RF28T5001SR model since it has NO water or ice dispenser on the doors and no water dispenser inside the fridge--features I do not need or want. The ice maker is inside the freezer drawer. For those like myself who do not need ice, I can disconnect it by pressing a button after it has performed two or three ice cycles.  An ice tray can do the trick for those who use little ice. After going over several brands I concluded that while all seemed to have big or small issues and complaints, some reviews reflected on defects pertaining to other model(s)--not the one being viewed. Concerned about this unit's reviews, I noticed that many of the bad ones rightfully pertained to specific models with different features. I am giving this refrigerator a tentative five stars until I have tested its performance for at least a month and then after a longer period of time. At those times, the rating will be confirmed or updated. Fair is fair."
+--------------------------------------------------------------------------------
+
+3. MANDATORY CORRECTIVE ACTIONS
+-------------------------------
+To maintain active listing eligibility on the catalog, you must submit:
+  [ ] Batch Material Testing Certificate addressing [Core Quality & Defect].
+  [ ] Dimension / Fitment Verification Report ensuring accurate specification.
+  [ ] Remediation roadmap for inventory manufactured after recent quality decay.
+
+Failure to respond within 14 business days will result in automated de-ranking 
+and permanent placement under the "Misleading Quality Trap" quarantine segment.
+
+ISSUED BY:
+Aislewise Product Integrity & Discrepancy Forensic Engine
+Contact: integrity-ops@aislewise.internal
+================================================================================

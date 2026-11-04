@@ -1,0 +1,364 @@
+====================================================================
+       AISLEWISE FORENSIC REPORT: SEVERE SCENARIO A COMPLAINTS       
+  Generated Threshold: Rating >= 4.0 | Neg % >= 50.0% | Min Reviews >= 3
+  Total Severe Products Flagged: 29
+  Total Converted Customer Complaints: 61
+====================================================================
+
+PRODUCT ID: B00545AV9Q
+  - Displayed Star Rating: 4.43 / 5.0 (High Star Illusion)
+  - Actual Negative Reviews: 57.14% (4 out of 7 reviews)
+  - Customer Evidence & Complaints Log:
+    [1] Severity: CRITICAL | Issue: Size & Fit Defect | Stars: 1.0
+        Verified: True | Title: Wouldn’t Fit
+        Complaint: "Made of good quality but, it wouldn’t fit my refrigerator even after I put in my model number to get the correct part."
+    [2] Severity: HIGH | Issue: Size & Fit Defect | Stars: 5.0
+        Verified: True | Title: Fits perfectly
+        Complaint: "I was so upset for breaking my original shelf in my refrigerator, but Amazon had replacements! A lot cheaper than the Frigidaire website, too. Got it the next day, popped it in. All better!!"
+    [3] Severity: HIGH | Issue: Product Quality Failure | Stars: 5.0
+        Verified: True | Title: Used it to replace old broken one
+        Complaint: "Used it to replace old broken one"
+    [4] Severity: HIGH | Issue: Product Quality Failure | Stars: 5.0
+        Verified: True | Title: Bottom fridge bin
+        Complaint: "Fridge bottom portion of door was broken for some time it needed a replacement.  Now all will be complete once again!!"
+--------------------------------------------------------------------
+
+PRODUCT ID: B00OMQZU6M
+  - Displayed Star Rating: 4.2 / 5.0 (High Star Illusion)
+  - Actual Negative Reviews: 60.0% (3 out of 5 reviews)
+  - Customer Evidence & Complaints Log:
+    [1] Severity: HIGH | Issue: Product Quality Failure | Stars: 5.0
+        Verified: True | Title: Cheap and effective.  Thank you!
+        Complaint: "Under 7 bucks and the fridge came alive.  Watch YouTube videos on how to test the thermistors and replace.  Or just replace all of them.  Still a lot cheaper than a new fridge or calling a tech."
+    [2] Severity: CRITICAL | Issue: Shipping Damage / Delay | Stars: 1.0
+        Verified: True | Title: Not an OEM part
+        Complaint: "Description says OEM made in Mexico but sensor was shipped in a generic bag with a sticker labeled Made in China. I paid more for OEM. Could have gotten 3 non OEM for the same price. Returned sensor and will buy elsewhere."
+    [3] Severity: HIGH | Issue: General Malfunction | Stars: 5.0
+        Verified: True | Title: Refrigerator...sensors
+        Complaint: "GE Profile  had faulty sensors tested them, all were bad Got my Refrigerator...Working like new !!!"
+--------------------------------------------------------------------
+
+PRODUCT ID: B00DM8JK3A
+  - Displayed Star Rating: 5.0 / 5.0 (High Star Illusion)
+  - Actual Negative Reviews: 50.0% (2 out of 4 reviews)
+  - Customer Evidence & Complaints Log:
+    [1] Severity: HIGH | Issue: Size & Fit Defect | Stars: 5.0
+        Verified: True | Title: Worked miracles on an old Amana
+        Complaint: "Our Amana AGS760WW range (from the early 80s) starting becoming slow to light and eventually just reeked of unlit gas.  Some online research revealed that the igniter heats up by was of resistance and the flow of current then triggers the gas valve to open.  A complete, but poorly performing ingniter would display my symptoms, so I sought out the right part.<br /><br />When shopping on some appliance part website, my handy Amazon Google Chrome plug in displayed a message saying that Amazon had it, and sure enough they did (and at 40% of the price) and it was available with Prime shipping!  I never knew to look at Amazon.  The first igniter arrived on a sub zero day, well packed but was broke.  Having read other reviews I understood these to be highly brittle, and sure enough it was.  As noted it was very well packed, but the conditions were less than ideal.  A prompt replacement was dispatched, and it arrived intact.<br /><br />I skooted the oven out, unplugged the power (left the gas line connected), and removed the door and racks.  The metal guard that shrouds the ignited was held in place by three easy to remove sheet metal screws, and the I pulled the old igniter out.  At first glance, it seems much bigger than what's in my oven, but much get's hidden behind the back wall.  It's an identical part.  I fished the wire nuts out via the smallish hole to unscrew the old unit.  I replaced the plastic ones with new ceramic wire nuts (rate for high temps, but the old ones should work).  Note these were not included with the replacement part, but likely weren't needed. Then I put everything back into place.  The hardest part was removing the metal guard from the old igniter and installing on the new one, especially while being fearful of it's brittle nature.  All in all, it took 20 minutes, including putting the door back on (which can be tricky).<br /><br />Everything worked great, and the oven heats much faster than I've ever seen.  It must have been going bad these last few years.  I'm so glad I fixed this myself."
+    [2] Severity: HIGH | Issue: Product Quality Failure | Stars: 5.0
+        Verified: True | Title: A fraction of the repair cost compared to calling an appliance guy!
+        Complaint: "We have an old Caloric brand wall oven that came with the house. I have no idea how old it is, but within a year or two of living here, the oven stopped working. It would glow, but no gas would come out and it would never start. I called an appliance repair man who determined it was a bad ignitor. He explained to me that the gas won't turn on until the ignitor reaches a certain temp, so either the ignitor wasn't getting hot enough, or it wasn't sending the signal to turn on the gas when it did. Either way, the problem was entirely with the ignitor. He replaced it, and something like $200 later, the oven was back to working. Until it stopped working again about a year after that. This time it didn't even glow, the oven would just do nothing.<br /><br />Instead of another expensive repair, I decided on a hunch to assume the part the repair man brought was lower quality than the original. I looked it up online and found a match here on Amazon. I felt confident that I could swap it myself now that I saw the repair guy do it, and sure enough this did the trick for a fraction of what I would pay him to come back! Its been a little over a month since putting it in, and so far so good. I'm hoping this will last longer than the last one, but even if it doesn't, worst case scenario is that I'll spend $20-30 on an annual repair until we can afford to replace the whole oven! I can deal with that."
+--------------------------------------------------------------------
+
+PRODUCT ID: B004XLE7O2
+  - Displayed Star Rating: 4.0 / 5.0 (High Star Illusion)
+  - Actual Negative Reviews: 50.0% (2 out of 4 reviews)
+  - Customer Evidence & Complaints Log:
+    [1] Severity: CRITICAL | Issue: Size & Fit Defect | Stars: 1.0
+        Verified: True | Title: Five stars *after* a slight modification.
+        Complaint: "This product worked perfectly with a few modifications. If you get this part and it doesn't seem to fit and bends slightly outward at the ends, then read on (and be ready to grab a file or hacksaw).<br /><br />A few other reviewers have mentioned the protruding circular knobs near each end of the part. For our specific Whirlpool refrigerator, there must have been a minor design change since there were no detents for this protrusion to fit into causing the part to bend slightly inward -- enough for the drawer not to fit.<br /><br />As others have said, once these small plastic knobs were removed (personally, I used a small hacksaw to remove the protruding bit), the part worked exactly as the original part.<br /><br />Even though my satisfaction with the part rates a 5-star review, I decided to give this 1-star because of the way I typically read ratings. If I see an average rating of 4-5 stars, I might read one or two, but then I focus on the lower-rated reviews to get a better idea of problems with the product that the others may not have seen.<br /><br />If you're reading this, then, just a heads-up that you may need to slightly modify the part in order to get it to fit -- then it's a 5 of 5."
+    [2] Severity: HIGH | Issue: Product Quality Failure | Stars: 5.0
+        Verified: True | Title: Well it is overpriced in general but this one is ...
+        Complaint: "Well it is overpriced in general but this one is the cheapest one around. My Whirlpool drawer was repaired in seconds. OEM!"
+--------------------------------------------------------------------
+
+PRODUCT ID: B001E6FOAU
+  - Displayed Star Rating: 4.5 / 5.0 (High Star Illusion)
+  - Actual Negative Reviews: 50.0% (2 out of 4 reviews)
+  - Customer Evidence & Complaints Log:
+    [1] Severity: HIGH | Issue: Size & Fit Defect | Stars: 3.0
+        Verified: False | Title: Thick metal, good quality.
+        Complaint: "Even though I didn't use it and returned it...After I recieved it, I found that it was pretty heavy guage metal. Better quality than what you're going to find in a big box store. Return process was painless, I would reorder it in a minute should I need it for another job."
+    [2] Severity: HIGH | Issue: Product Quality Failure | Stars: 5.0
+        Verified: True | Title: transition makes it easy. Well built to last many years
+        Complaint: "No cheap plastic here and the 3 or 4 in. transition makes it easy.  Well built to last many years."
+--------------------------------------------------------------------
+
+PRODUCT ID: B00DNCJRX8
+  - Displayed Star Rating: 4.0 / 5.0 (High Star Illusion)
+  - Actual Negative Reviews: 50.0% (2 out of 4 reviews)
+  - Customer Evidence & Complaints Log:
+    [1] Severity: HIGH | Issue: Product Quality Failure | Stars: 5.0
+        Verified: True | Title: Exact replacement for Whirlpool fridge
+        Complaint: "This ice maker exactly replaced and fixed the defective one in my Whirlpool GS6SHEXNL 00 (mfg date 09/05) side by side fridge."
+    [2] Severity: CRITICAL | Issue: Product Quality Failure | Stars: 1.0
+        Verified: True | Title: Arrived Broke
+        Complaint: "I was able to use the original frame from the dead icemaker which was broken on the new icemaker, to fix the part and salvage the process of fixing the icemaker.  It is churning out ice nicely.  The outside box was intact/undamaged, and inside a second box surrounded by air pillows.  I presume the air pillows were inadequate to keep the part from breaking."
+--------------------------------------------------------------------
+
+PRODUCT ID: B07JQTW7NF
+  - Displayed Star Rating: 4.5 / 5.0 (High Star Illusion)
+  - Actual Negative Reviews: 50.0% (2 out of 4 reviews)
+  - Customer Evidence & Complaints Log:
+    [1] Severity: HIGH | Issue: Product Quality Failure | Stars: 5.0
+        Verified: True | Title: It worked.
+        Complaint: "Our dryer stopped turning on.  I did a little research on why and then decided to replace the fuse blindly.  (I did test the old one and new one after they arrived and old one was dead)<br />I<br />Anyway what a cheap fix, very pleased."
+    [2] Severity: HIGH | Issue: Product Quality Failure | Stars: 5.0
+        Verified: True | Title: If it works for my dryer
+        Complaint: "It was very easy to install cheap in the dryer is working"
+--------------------------------------------------------------------
+
+PRODUCT ID: B000IJUX4G
+  - Displayed Star Rating: 4.25 / 5.0 (High Star Illusion)
+  - Actual Negative Reviews: 50.0% (2 out of 4 reviews)
+  - Customer Evidence & Complaints Log:
+    [1] Severity: HIGH | Issue: Size & Fit Defect | Stars: 3.0
+        Verified: True | Title: pretty disappointed
+        Complaint: "Pretty disappointed with this purchase.  Spent a lot of time reading reviews.  There are a lot of 3 star exhaust fans out there and this was one of the few that received 4+.  Was disappointed the moment it arrived.  Everything about it is chincy.  All 4 metal brackets were bent.  It was a breeze to bend them back by hand because the metal was so soft (mind you, these are supposed to be the &#34;sturdy&#34; brackets to mount the unit to your joist).  The internal fan unit was somehow installed crooked in the housing when I pulled it from the box?  It was like somebody sat on it, causing it to be pushed into the housing on a 45 degree angle...bending some of the internal parts.  Had to pull it out and rebend to get it to sit flush.  The instructions show 3 screws holding the motor to the fan...but there was only 1 screw.  And it's not as though they just forgot some other screws...there weren't even other holes for the other screws!  Despite all of these things, I still brought it up to the attic to install.  Once I began the electrical work, I just couldn't take it.  The box is SO tiny, it is impossible to fit all of your connections in there...even if you had a 12/2 and 12/3!  Needless to say, I returned it, spent the extra $95 for a Panasonic and couldn't be happier.  The second I pulled the Panasonic from the box, I knew it was money well-spent.  Solid, straight, oversized electrical box.  Unfortunately, this Air King model just didn't cut it.  Actually, it didn't even come close."
+    [2] Severity: HIGH | Issue: Product Quality Failure | Stars: 4.0
+        Verified: True | Title: Very quiet; does the job
+        Complaint: "I'm giving this four stars rather than five only because when you look up at the fan, you can see ugly metal inner workings.  Since the fan is see-through, they could have made the &#34;inside&#34; that you can see look a little better.  Looks cheap, but does the job."
+--------------------------------------------------------------------
+
+PRODUCT ID: B00PIU37TS
+  - Displayed Star Rating: 4.25 / 5.0 (High Star Illusion)
+  - Actual Negative Reviews: 50.0% (2 out of 4 reviews)
+  - Customer Evidence & Complaints Log:
+    [1] Severity: HIGH | Issue: Size & Fit Defect | Stars: 3.0
+        Verified: True | Title: Three Stars
+        Complaint: "Did not fit. Returning. Please look at dimensions before ordering."
+    [2] Severity: HIGH | Issue: Product Quality Failure | Stars: 5.0
+        Verified: False | Title: Smart guy that Frank
+        Complaint: "I want to thank Frank in the question and answer section. He recommended just drilling a hole and putting a screw in the broken one. That’s what I did and it’s fixed, didn’t have to buy anything thing - Smart guy that Frank"
+--------------------------------------------------------------------
+
+PRODUCT ID: B075L531TR
+  - Displayed Star Rating: 4.0 / 5.0 (High Star Illusion)
+  - Actual Negative Reviews: 50.0% (2 out of 4 reviews)
+  - Customer Evidence & Complaints Log:
+    [1] Severity: CRITICAL | Issue: Size & Fit Defect | Stars: 1.0
+        Verified: True | Title: It's too small to brew any volume.
+        Complaint: "I filled to the absolute top with ground coffee and it held 5.5 ounces. Unfortunately, you can't brew it that way because the coffee at the top doesn't get into the water enough to actually participate in the brewing.<br /><br />So, in order to use it to brew coffee, you'd have to fill it about 3/4 full which is only about 4 ounces of coffee so if you're trying to brew a half gallon mason jar of cold brew coffee, 4 ounces doesn't work. It would be extremely weak or you would have to brew it for days to get any flavor and, that's pretty much worthless.<br /><br />So, it's probably fine if you want to brew a very small amount, like a single or double serving, of something but that's a lot of work for a couple of servings.<br /><br />If were double the size, it'd be great but, as is - doesn't work for me."
+    [2] Severity: CRITICAL | Issue: Size & Fit Defect | Stars: 5.0
+        Verified: True | Title: Fabulous
+        Complaint: "I bought 2 of these filters, and use them in a 64oz mason jar. They will fit smaller jars, but we like our coffee, so it is a waste of time to make small batches. So far they have performed well, and are holding up to use. It is saving me a load of $$ now that I do not have to buy cold brew coffee at the grocery store."
+--------------------------------------------------------------------
+
+PRODUCT ID: B003BIGDHW
+  - Displayed Star Rating: 4.25 / 5.0 (High Star Illusion)
+  - Actual Negative Reviews: 50.0% (2 out of 4 reviews)
+  - Customer Evidence & Complaints Log:
+    [1] Severity: HIGH | Issue: Product Quality Failure | Stars: 2.0
+        Verified: True | Title: YOU ARE BUYING A USED PART
+        Complaint: "I didn't read the page carefully enough and didn't realize this is a USED part.  When my plumber went to install it, it still had pieces of old tubing inside it and he had to take a lot of time to get it to installable condition.  You can buy a NEW one here: [[ASIN:B00570QEZI NEW Replacement Part - GE Refrigerator Dual Solenoid inlet Water Valve Part# WR57X10051]] - and as of this review, it's cheaper!!!!!  Don't make the mistake I did!  I paid more for the part, and more for the extra time it took my plumber to fix the part!"
+    [2] Severity: HIGH | Issue: General Malfunction | Stars: 5.0
+        Verified: True | Title: Replaced the bad part and the fridge just worked
+        Complaint: "The truth is I cannot believe it worked.  Replaced the bad part and the fridge just worked."
+--------------------------------------------------------------------
+
+PRODUCT ID: B01BHUSQZ2
+  - Displayed Star Rating: 4.0 / 5.0 (High Star Illusion)
+  - Actual Negative Reviews: 50.0% (2 out of 4 reviews)
+  - Customer Evidence & Complaints Log:
+    [1] Severity: CRITICAL | Issue: Size & Fit Defect | Stars: 3.0
+        Verified: False | Title: Nice filter that works with almost any container, bad pitcher
+        Complaint: "We mostly buy bottled water or when available fill our water bottles at the machines in front of grocery stores.  Occasionally when we're running a bit low and I want to make a pitcher of iced tea I'll use tap water so we still have water.  Every time I do I think of all of the current news stories involving dangerous or even poisonous tap water. I figured a filter, any filter, can only help.  The fact that this comes with a pitcher and a filter that can be used with the pitcher or with almost anything else you have in the house was a bonus.<br /><br />The pitcher is a serious disappointment to me.  If  were rating it alone, it'd get 1 star. The spout that closes for pouring has a gap in that allows water to pour out even when closed -- though it doesn't snap closed so if you bump the pitcher a little the spout flaps all around.  The plastic feels cheap.  It really need a different lid that doesn't pop off so easily.  That's the bad.<br /><br />The good is the filter itself is easy to use.  It can be used in almost any pitcher or bottle you have at home.  In fact If it's possible, I'd recommend buying the filter section without the pitcher.  It has markings so you can see what month you starting using the filter.  Although you CAN filter water fast, if you're not fond of wasting water I'd actually do it at a slower steady stream as the filter itself does not hold a lot of water so a lot of water is literally going down the drain as it pours out over the filter.  At a slower pace I filled the pitched quite a bit slower but wasted a lot less.<br /><br />In the end, I'd recommend the filter itself but not the pitcher."
+    [2] Severity: HIGH | Issue: Size & Fit Defect | Stars: 4.0
+        Verified: False | Title: A handsome and quick filter, but a bit pricey to own
+        Complaint: "This is prettier than a Brita and faster than a Brita.<br /><br />The looks speak for themselves, but I like it.  It's even nice looking in person.  There are a couple issues.  One is the spout needs some work.  The other is the upper reservoir.  Yeah it does filter faster, but you'll need to fill it a few times due to the small size.  In general it's not the worst problem, as it would only take away from the overall capacity.  The fact you can use it on other pitchers is a huge plus.<br /><br />Why only 4 stars?  The price of this device, the price of the filters, and the couple small issues (mostly the spout).  FWIW, it's hard to beat Brita--not so much the company but the ecosystem of cheap filters at Sams or Costco not to mention knock offs."
+--------------------------------------------------------------------
+
+PRODUCT ID: B07YHLB84H
+  - Displayed Star Rating: 4.0 / 5.0 (High Star Illusion)
+  - Actual Negative Reviews: 50.0% (2 out of 4 reviews)
+  - Customer Evidence & Complaints Log:
+    [1] Severity: HIGH | Issue: Size & Fit Defect | Stars: 5.0
+        Verified: True | Title: Did exactly what I needed
+        Complaint: "One of our rollers was broken so we ordered this. Installation was easy enough, I watched a video for replacing the rack adjuster and was done in under 10 minutes. Parts fit well and don't look any better or worse than the originals."
+    [2] Severity: CRITICAL | Issue: Product Quality Failure | Stars: 1.0
+        Verified: True | Title: Cheap plastic, does not hold up
+        Complaint: "Looks good when it arrives, but the plastic is different from the original. Soon, over multiple washes the plastic becomes brittle. I purchased this kit FEB 2021 and parts started breaking in April. Definitely go with original manufacturer aka OEM for quality parts that will last."
+--------------------------------------------------------------------
+
+PRODUCT ID: B07W4MCG4Q
+  - Displayed Star Rating: 4.25 / 5.0 (High Star Illusion)
+  - Actual Negative Reviews: 50.0% (2 out of 4 reviews)
+  - Customer Evidence & Complaints Log:
+    [1] Severity: HIGH | Issue: Size & Fit Defect | Stars: 2.0
+        Verified: True | Title: Not the right sizes
+        Complaint: "The belt and tensioner are both a little different size than original, which makes them rub the drum.  After bending and tweaking I got it to work with just a few clothes, any more and the drum wouldn't turn.  Yes I had the correct parts and part numbers.  I found original old stock OEM kits and bought two so I would have spares.  The OEM belt is much much better quality, its like a car belt with fibers.  The one in this kit looked like it would go in a few months.  Look for a kit with a red and black belt.  That is OEM"
+    [2] Severity: HIGH | Issue: General Malfunction | Stars: 5.0
+        Verified: True | Title: Dryer repair kit
+        Complaint: "Ordered for kenmore dryer that the belt broke on , ordered this kit to replace older parts that could go bad . Everything worked ."
+--------------------------------------------------------------------
+
+PRODUCT ID: B09WTVSN57
+  - Displayed Star Rating: 4.0 / 5.0 (High Star Illusion)
+  - Actual Negative Reviews: 50.0% (2 out of 4 reviews)
+  - Customer Evidence & Complaints Log:
+    [1] Severity: CRITICAL | Issue: Product Quality Failure | Stars: 4.0
+        Verified: False | Title: Great Overall Ice Maker
+        Complaint: "I've wanted a built-in ice maker for some time.  There are 7 of us sharing the ice maker in a fridge and it just never cut it!  I had two options in ice makers:  nugget or cube.  Nugget ice is much more fun, but it's not good for coolers.  Cube ice works for both.  So I got the cube maker.  If I ever win the lottery, I'll get the other one too!<br /><br />Anyway, the machine was a pain to install, but that's not its fault.  First I hired someone because they had to move my fridge, tap a water line, and break through the wall to install the drain.  They screwed all of that up and I ended up with a leak, a damaged fridge, and the drain line was leaking as well.  They fixed two of the three a week later and now it works well (though the fridge is another story).  The instructions were poor, that caused some of the problem (even the professional misread them).  I mean, if you're selling a $500 product, can't you afford proper instructions with real pictures written by someone who speaks English?<br /><br />All that aside, there is one thing I took off a star for:  The unit doesn't stay frozen!  It makes ice and dumps it in a fridge.  It melts because that is a fridge not a freezer.  And then it makes more ice.  This causes a lot of wasted water and electricity, and it means that you absolutely must have that drain line installed!<br /><br />I had another one of these some time back that cost a lot less and made about half as much ice a day.  That one was insulated and stayed below 0, so the ice never melted!  I didn't even connect the drain line and in 4 years of use, it never leaked.  If I were to go back to the start of this project, I would have gotten that again.  That's the reason I took off a star.  The other style would have saved energy and cost $200 instead of $500...  But overall, considering that I got the item at a discount here, I'm okay with this outcome."
+    [2] Severity: HIGH | Issue: Size & Fit Defect | Stars: 3.0
+        Verified: False | Title: Made in China. Horrible instructions. Bottled water info in the review.
+        Complaint: "If going to use this with bottled water… Get ready. You really need to look at the last picture, above the reviews, to see exactly how to insert the tube for bottled water. The instructions give you very little information. The instructions overall are very poor. The Chinese translation is also poor. Have a Chinese company is going to charge $500 for an icemaker that should not cost more than a couple hundred bucks, then the least they could do is pay for professional translation.<br /><br />Also… If you are using bottled water, you have to tell the machine where the water source is coming from. There is information on page 13 which should show this. On the control panel, on the lower right, you should see an image of the ice machine and next to it either a straight line or a circle. A straight line means that the water is coming from bottled water and a circle means that it is coming from the faucet. To change this, you need to stick and unbent paperclip (or something else similar) into a little hole that is below the on off.<br /><br />Keep in mind that this icemaker make size but does not keep it frozen. So if you need a lot of ice, then you will need to package the eyes into bags or something else in place it in your own freezer. Because otherwise it will simply melt and the machine and be recycled.<br /><br />This icemaker is made in China and being sold by Chinese company on Amazon. At the current price of 500 bucks is well over twice the price it should be."
+--------------------------------------------------------------------
+
+PRODUCT ID: B07M7XYN2K
+  - Displayed Star Rating: 4.0 / 5.0 (High Star Illusion)
+  - Actual Negative Reviews: 50.0% (2 out of 4 reviews)
+  - Customer Evidence & Complaints Log:
+    [1] Severity: HIGH | Issue: General Malfunction | Stars: 2.0
+        Verified: True | Title: These kept pulling back out, returned these and used plastic zip ties like one guy recommended.
+        Complaint: "Installed new KitchenAid dishwasher, misplaced the plastic screws that holds the kick plate on. People are getting charged 10-12 dollars for 1 screw which is a rip off. I bought these since they were 2 for $10. Bad decision. I finally went with the guy who recommend plastic zip ties. They work like a charm"
+    [2] Severity: HIGH | Issue: Product Quality Failure | Stars: 4.0
+        Verified: True | Title: Cheaply made but worked
+        Complaint: "These are for sure made from cheap plastic but for me they got the job done."
+--------------------------------------------------------------------
+
+PRODUCT ID: B01ARKVR36
+  - Displayed Star Rating: 5.0 / 5.0 (High Star Illusion)
+  - Actual Negative Reviews: 50.0% (2 out of 4 reviews)
+  - Customer Evidence & Complaints Log:
+    [1] Severity: CRITICAL | Issue: Product Quality Failure | Stars: 5.0
+        Verified: True | Title: Fixed my problem
+        Complaint: "My burner would either be full blast on or off. This part fixed the problem. A little pricey, but overall cheaper than buying a new stove."
+    [2] Severity: HIGH | Issue: Size & Fit Defect | Stars: 5.0
+        Verified: True | Title: Working fine after two weeks.
+        Complaint: "The switch worked fine, the LED light is not and LED, it has a light source clipped on to the back, and it is done in a very poor fitting way. Somehow, that clip with the light fell away from the red plastic that you see above the switch. I arranged the wires differently, and  then used a tiny tie-wrap to take any tension away from pulling the clip off.  I will cancel the return, as the switch was working, and it was just the light that had failed to stay connected."
+--------------------------------------------------------------------
+
+PRODUCT ID: B073SN6ZDV
+  - Displayed Star Rating: 4.0 / 5.0 (High Star Illusion)
+  - Actual Negative Reviews: 66.67% (2 out of 3 reviews)
+  - Customer Evidence & Complaints Log:
+    [1] Severity: HIGH | Issue: General Malfunction | Stars: 2.0
+        Verified: True | Title: Manual did not come with the controller and possibly returned item sold as new
+        Complaint: "While it is not rocket science to install this controller, I do expect the manual to come with the unit as indicated on Amazon web page. The unit was also poorly wrapped in plastic, looked like it was a returned item and sold as new. Definitely not happy.<br /><br />I knew I had to open up the case but was concerned about damaging it since I was thinking about returning it. In the end, I decided to give it a chance and opened it. It was harder than it should be but still doable. I then I had to go online to search for the manual. I then bench tested the controller to make sure that it was functioning properly. And it was. Now the rest of the installation was quite straightforward.<br /><br />I would not recommend this controller because of the poor business practices - 1) possibly returned item sold as new, and 2) no manual. These project a poor image of the company."
+    [2] Severity: HIGH | Issue: Size & Fit Defect | Stars: 5.0
+        Verified: True | Title: Great product for moisture control
+        Complaint: "I had a moisture problem in my attic so I bought two of these for my attic fans and now they run pretty much 24/7 during the summer and off and on during the winter depending on the humidity in the attic. It really helped with the moisture issues I was having and it wasn’t bad installing it. If it didn’t have the greenfield (metal cladding) was too small for me since I wanted to tie in the ground inside the box, but otherwise it worked. The directions are through if you need it, just mark your wires on your fan when removing them beforehand so you won’t second guess yourself."
+--------------------------------------------------------------------
+
+PRODUCT ID: B00CW0O1EW
+  - Displayed Star Rating: 5.0 / 5.0 (High Star Illusion)
+  - Actual Negative Reviews: 66.67% (2 out of 3 reviews)
+  - Customer Evidence & Complaints Log:
+    [1] Severity: HIGH | Issue: Product Quality Failure | Stars: 5.0
+        Verified: True | Title: Five Stars
+        Complaint: "Couldn't believe how much cheaper than the parts store 10 for the price of one"
+    [2] Severity: HIGH | Issue: Product Quality Failure | Stars: 5.0
+        Verified: True | Title: Five Stars
+        Complaint: "they are fuse and they work and they are cheap"
+--------------------------------------------------------------------
+
+PRODUCT ID: B0C5FQ4DSK
+  - Displayed Star Rating: 4.0 / 5.0 (High Star Illusion)
+  - Actual Negative Reviews: 66.67% (2 out of 3 reviews)
+  - Customer Evidence & Complaints Log:
+    [1] Severity: HIGH | Issue: General Malfunction | Stars: 2.0
+        Verified: True | Title: Can't use a paper filter
+        Complaint: "I couldn't use these particular K-cups because they wouldn't stay closed when using a paper filter.  They did work OK without a filter.  If you use a paper filter, don't buy these."
+    [2] Severity: CRITICAL | Issue: General Malfunction | Stars: 5.0
+        Verified: True | Title: nice alternative to K-cups
+        Complaint: "These reusable cups are easy to use with a Keurig and don't waste all the plastic that the individual use pods do."
+--------------------------------------------------------------------
+
+PRODUCT ID: B00OQFG3Q0
+  - Displayed Star Rating: 5.0 / 5.0 (High Star Illusion)
+  - Actual Negative Reviews: 66.67% (2 out of 3 reviews)
+  - Customer Evidence & Complaints Log:
+    [1] Severity: HIGH | Issue: Size & Fit Defect | Stars: 5.0
+        Verified: True | Title: Quick delivery, quick return, quicker refund!
+        Complaint: "When searching for the right part this one was stated as “could not be 100% sure to fit.”Bought in case it was the right one. It was not. That’s ok. Was simple to return, had refund before I got home from dropping off locally."
+    [2] Severity: HIGH | Issue: Product Quality Failure | Stars: 5.0
+        Verified: True | Title: Saved me from buying a new washing machine
+        Complaint: "We were having issues with our washer leaking. The options were to order direct from Sears for over $60 or to order online. We went for a better bargain with this item and it is working wonderful. No more leaking washer and no more struggle of having that wayer pout out onto the floor (yes it was that bad of a leak) we did laundry every other day and the tub would fill up and make it flood the bathroom in order to drain it. This item has changed our outlook on laundry and i no longer dread opening the washing machine. This product saved us from needing to buy a new washing machine."
+--------------------------------------------------------------------
+
+PRODUCT ID: B09MMCMB38
+  - Displayed Star Rating: 5.0 / 5.0 (High Star Illusion)
+  - Actual Negative Reviews: 66.67% (2 out of 3 reviews)
+  - Customer Evidence & Complaints Log:
+    [1] Severity: HIGH | Issue: Product Quality Failure | Stars: 5.0
+        Verified: True | Title: Very easy with you tube video
+        Complaint: "Found a you tube video on how to take this apart.  Took about 20 minutes.  I strongly suggest a steamer to quickly melt the ice build up and avoid any broken  plastic pieces."
+    [2] Severity: HIGH | Issue: Product Quality Failure | Stars: 5.0
+        Verified: True | Title: Works Perfectly, and solved the problem
+        Complaint: "this was a very cheap alternative to replacing the fridge or having it repaired. It took less than 30 minutes, and our fridge was up and running."
+--------------------------------------------------------------------
+
+PRODUCT ID: B00DM8M6DG
+  - Displayed Star Rating: 4.0 / 5.0 (High Star Illusion)
+  - Actual Negative Reviews: 66.67% (2 out of 3 reviews)
+  - Customer Evidence & Complaints Log:
+    [1] Severity: HIGH | Issue: Size & Fit Defect | Stars: 2.0
+        Verified: True | Title: but it still has the same crappy design as the original
+        Complaint: "it works, but it still has the same crappy design as the original.  the axle shaft is sealed with a simple o-ring rather than a proper axle-seal style fitting, so it will start to leak again in short order.  i got rid of this dishwasher and will never buy another frigidaire/electrolux again."
+    [2] Severity: HIGH | Issue: Product Quality Failure | Stars: 5.0
+        Verified: True | Title: Dishwasher super loud?
+        Complaint: "My dishwasher suddenly became incredibly loud and after doing a little bit of investigation and YouTube research, this was the part that needed to be replaced. As someone who knows absolutely nothing or dishwashers I was a little hesitant as it could be the wrong part, but this was really easy to install cheap and definitely fix the problem."
+--------------------------------------------------------------------
+
+PRODUCT ID: B07X4CBPZ2
+  - Displayed Star Rating: 4.33 / 5.0 (High Star Illusion)
+  - Actual Negative Reviews: 66.67% (2 out of 3 reviews)
+  - Customer Evidence & Complaints Log:
+    [1] Severity: HIGH | Issue: Size & Fit Defect | Stars: 3.0
+        Verified: True | Title: Just Okay
+        Complaint: "Cheaply made, doesn’t last but a quick fix. Belt doesn’t fit."
+    [2] Severity: HIGH | Issue: Size & Fit Defect | Stars: 5.0
+        Verified: True | Title: Great price and top quality
+        Complaint: "All the parts fit very well and fixed up my dryer like new. This is not a really quick project for the DIY'er, but anyone can perform this repair. Take note of where each screw came from, pay attention to how things fit together, piece of cake. Slipping the belt over the belt tensioner is a little bit if a challenge but not too bad, a little bit of masking tape will help reduce the sharp edges around the access.<br />Have fun😁😁"
+--------------------------------------------------------------------
+
+PRODUCT ID: B008HRY4ZU
+  - Displayed Star Rating: 4.0 / 5.0 (High Star Illusion)
+  - Actual Negative Reviews: 66.67% (2 out of 3 reviews)
+  - Customer Evidence & Complaints Log:
+    [1] Severity: HIGH | Issue: Size & Fit Defect | Stars: 2.0
+        Verified: True | Title: Disappointed
+        Complaint: "Was disappointed nothing written about containing no lids. Had to buy new ones. Found at good price too."
+    [2] Severity: HIGH | Issue: Size & Fit Defect | Stars: 5.0
+        Verified: True | Title: Good buy
+        Complaint: "Fits my coffee machine and no mess. Cheaper way to enjoy a single cup of coffee"
+--------------------------------------------------------------------
+
+PRODUCT ID: B06XJ9YKQH
+  - Displayed Star Rating: 4.0 / 5.0 (High Star Illusion)
+  - Actual Negative Reviews: 66.67% (2 out of 3 reviews)
+  - Customer Evidence & Complaints Log:
+    [1] Severity: HIGH | Issue: Size & Fit Defect | Stars: 5.0
+        Verified: True | Title: Good luck
+        Complaint: "This was an easy repair, but can be a bit nervy as you have to be very careful when changing it out. First, you need to be absolutely sure that your frig is out of warranty (yes, this is the one time you should have purchased that extened warranty).  Be sure the installed unit is completely deforsted using the force defrost mode or shut ot down for 24 hours. Ensure the ice make is completely free of ice. Remove the harness trim and disconnect the wiring harness. You then need to remove the set screw and detent tab to drop down the bottom half of the component. If this doesn't make any sense to you stop here and call a professional. If you're tracking thus far carefully pull down the lower half and depress the upper tab to free the unit, then slide the ice maker out from around the coil (if you damage this coil just push you refrigerator to the curb for trash pick up, because it'll cost more to fix it than to buy another one). If you manage to get this far, use some food grade silicone to seal up the comparment as this is most likely why you ice make compartment frosted up and damaged your ice maker (there are some youtube videos for this). Next install the new ice maker ensuring that the pads between the halves are aligned with the coil. Close everything back up. If this is outside your wheel house just pay the repairman their blood money. If they properly seal the compartment and don't damage anything during the installation of the new ice maker you shouldn't have any problems with your frig for a long time. Keep in mind that Samsung doesn't own the rights to bad ice make designs as the ice maker is usually the thing that causes the most problems for every brand. Our previous refrigerator was a Frigidaire and was so bad that we threw in the towel (boxing term for forfeiture because the boxer has been injuried soo badly that even they no longer can precieve that they should quit and their manager makes the call). Good luck."
+    [2] Severity: HIGH | Issue: General Malfunction | Stars: 2.0
+        Verified: True | Title: don't buy Samsung refrigerator
+        Complaint: "come to find out these ice makers only last about a year or two"
+--------------------------------------------------------------------
+
+PRODUCT ID: B0053F9IGO
+  - Displayed Star Rating: 5.0 / 5.0 (High Star Illusion)
+  - Actual Negative Reviews: 66.67% (2 out of 3 reviews)
+  - Customer Evidence & Complaints Log:
+    [1] Severity: HIGH | Issue: Product Quality Failure | Stars: 5.0
+        Verified: True | Title: MM
+        Complaint: ".  Between Google, you tube and Amazon ... Job completed.  The shipping was prompt and adequate. The price was cheaper than I expected and everything went fine.  Saved a ton of money by not having to call a repairman"
+    [2] Severity: HIGH | Issue: Product Quality Failure | Stars: 5.0
+        Verified: True | Title: Fixed my leaking water into Duet washer drum
+        Complaint: "My Duet front loading washer was leaking water into the drum when the unit was not being used.  This part is a EOM part and very simple to install.  Took me just over 10 minutes to swap out with defective part."
+--------------------------------------------------------------------
+
+PRODUCT ID: B08DHV86WK
+  - Displayed Star Rating: 4.0 / 5.0 (High Star Illusion)
+  - Actual Negative Reviews: 66.67% (2 out of 3 reviews)
+  - Customer Evidence & Complaints Log:
+    [1] Severity: HIGH | Issue: General Malfunction | Stars: 2.0
+        Verified: True | Title: Worked for a week
+        Complaint: "Worked great for a week before the washer started shaking again. I made sure it was balanced and everything. Will try a different company."
+    [2] Severity: HIGH | Issue: General Malfunction | Stars: 5.0
+        Verified: True | Title: Quick fix for unbalanced washer
+        Complaint: "Wasn't to bad to install, definitely watch you tube video to install them. Has worked so far. Better than buying new washer."
+--------------------------------------------------------------------
+
+PRODUCT ID: B0731P5KGC
+  - Displayed Star Rating: 4.0 / 5.0 (High Star Illusion)
+  - Actual Negative Reviews: 66.67% (2 out of 3 reviews)
+  - Customer Evidence & Complaints Log:
+    [1] Severity: HIGH | Issue: Size & Fit Defect | Stars: 2.0
+        Verified: True | Title: Don't buy unless you have plenty of space for the protruding vertical outer ridge
+        Complaint: "Disappointed when unit received it has a very tall ridge protruding along the outer bend exterior of the pipe.  Having such a large vertical ridge poses problems with fit in tight spaces.  I wound up re-using the original unit that it was supposed to replace as the original had no such protruding ridge."
+    [2] Severity: HIGH | Issue: Size & Fit Defect | Stars: 5.0
+        Verified: True | Title: These are nice if you NEED the short turn. Don't use these if a normal 90 will fit
+        Complaint: "Nice, compact short turn 90.<br />Aluminum, so it's easily damaged. Take it easy."
+--------------------------------------------------------------------
+

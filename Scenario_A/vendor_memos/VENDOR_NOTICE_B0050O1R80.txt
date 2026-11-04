@@ -1,0 +1,48 @@
+================================================================================
+                    OFFICIAL VENDOR QUALITY AUDIT NOTICE
+               Aislewise Automated Marketplace Intelligence System
+================================================================================
+DATE: November 04, 2026
+RECIPIENT: Quality Assurance & Product Operations (Supplier of ASIN: B0050O1R80)
+PRODUCT TITLE: Whirlpool 8300802 Fixed Thermostat for Stove
+ASIN / SKU: B0050O1R80
+AUDIT CLASSIFICATION: CRITICAL RATING DISCREPANCY (SCENARIO A - TRAP LISTING)
+ACTION REQUIRED: CORRECTIVE ACTION PLAN (CAP) WITHIN 14 BUSINESS DAYS
+================================================================================
+
+1. EXECUTIVE AUDIT SUMMARY
+--------------------------
+Our algorithmic monitoring detected an acute discrepancy between your public
+star rating and authentic post-purchase customer feedback:
+  * Public Marketplace Rating  : ⭐ 4.00 / 5.00 (Deceptively High)
+  * Analyzed Negative Reviews   : 🔴 100.0% (1 recorded severe failures)
+  * Customer Dissatisfaction Upvotes : 34 helpful votes from other buyers
+  * Dominant Root-Cause Driver  : [CORE QUALITY & DEFECT]
+
+CONCLUSION: Your public star rating does not reflect recent manufacturing quality. 
+Initial ratings mask ongoing durability degradation.
+
+2. VERIFIED CUSTOMER COMPLAINT EVIDENCE (FORENSIC LOG)
+------------------------------------------------------
+  [EVIDENCE RECORD #1]
+    - Assigned Stars : ⭐ 4.0 / 5.0 (Verified Buyer: True)
+    - Other Buyers Upvoted : 34 Helpful Votes
+    - Subject Line   : ""Sort" of resettable if it "blows""
+    - Ground Truth Statement:
+      "This is the infamous Whirlpool/Kitchenaid thermal fuse that blows when you run the cleaning cycle on the Kitchenaid KGSA906PSS range. You know, the problem everyone has, but Kitchenaid denies even happens; the reason I'll not buy Kitchenaid appliances again. All because of this fuse. Or rather, the poor implementation of the fuse into the design.<br /><br />Anyway, when it blows about an hour into the cleaning cycle because by design the oven gets so hot it blows the fuse (good job, Kitchenaid!), the door will remain locked closed and the timer display will go black. No clock, no controls. The burners will still light. That means power is getting to the stove, but the oven will be dead.<br />So if you need the oven, you are out of luck. DO NOT CLEAN THIS OVEN if you need it within a week.<br /><br />You will have to turn off the gas, unplug the power and disconnect the supply pipe from the range (I do that by removing the storage drawer and reaching underneath to disconnect from the range) then pull the range out enough so you can get behind it. There's a 24"x24" panel on the back held on with about 15 black square drive screws and an upper panel that is held on by a few Phillips drive screws. After removing the panels, you can see the fuse, attached to the back of the oven box, waiting for you to run the cleaning cycle so it can blow and cost you $40.<br /><br />After I got the replacement part reinstalled and put all the screws back in, plugged it in and reconnected the gas, everything worked as before.<br /><br />So I went out to the garage and took the blown fuse apart. It's a shame you cannot reset the fuse. There's no real reason you can't except they didn't design a little reset button into the fuse.<br /><br />The fuse "blows" when a little bimetal disc inside the fuse heats up and pops like a bottle cap, which allows a little plastic piston to move. This in turn allows two electrical contacts to separate. This turns off the power to the display, leaves the door locked and shuts off the gas to the stove. The oven then cools down, but the fuse stays in the "off" mode.<br /><br />After replacing the part and getting the oven to work, I broke the Bakelite open on the old fuse to see the innards. All I really needed to do was drill a tiny hole through the metal outer cap (but not through the bimetal) then poke a toothpick into the hole and pop the bimetal disc back into its original shape. It's not worth the trouble, but in a real pinch, it might work. The other way is to jumper over the two contacts, but of course, that's not recommended. We've had this range since 2005, though, and the fuse never blew before...because we never ran the cleaning cycle. So the fuse is there only in case you run the cleaning cycle. Apparently the oven box gets so hot during the normal cleaning cycle by design it can't stand it.<br /><br />Both my wife and I live-chatted with Kitchen reps. They asked if an electrical fuse had popped at the box and other lame excuses, all while denying there was any reported problem. But a quick net search shows many people have had this problem. It's big enough that Amazon carries this one part and "8300802" returns a lot of hits.<br /><br />I'm glad Amazon had the part. It got here in a hurry and it was the right part. Kitchenaid needs to stick with stand mixers and get out of the appliance biz."
+--------------------------------------------------------------------------------
+
+3. MANDATORY CORRECTIVE ACTIONS
+-------------------------------
+To maintain active listing eligibility on the catalog, you must submit:
+  [ ] Batch Material Testing Certificate addressing [Core Quality & Defect].
+  [ ] Dimension / Fitment Verification Report ensuring accurate specification.
+  [ ] Remediation roadmap for inventory manufactured after recent quality decay.
+
+Failure to respond within 14 business days will result in automated de-ranking 
+and permanent placement under the "Misleading Quality Trap" quarantine segment.
+
+ISSUED BY:
+Aislewise Product Integrity & Discrepancy Forensic Engine
+Contact: integrity-ops@aislewise.internal
+================================================================================

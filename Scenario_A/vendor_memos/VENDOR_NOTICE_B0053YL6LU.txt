@@ -1,0 +1,48 @@
+================================================================================
+                    OFFICIAL VENDOR QUALITY AUDIT NOTICE
+               Aislewise Automated Marketplace Intelligence System
+================================================================================
+DATE: November 04, 2026
+RECIPIENT: Quality Assurance & Product Operations (Supplier of ASIN: B0053YL6LU)
+PRODUCT TITLE: Bosch SHE3AR55UC Ascenta 24" Stainless Steel Full Console Dishwasher - Energy Star
+ASIN / SKU: B0053YL6LU
+AUDIT CLASSIFICATION: CRITICAL RATING DISCREPANCY (SCENARIO A - TRAP LISTING)
+ACTION REQUIRED: CORRECTIVE ACTION PLAN (CAP) WITHIN 14 BUSINESS DAYS
+================================================================================
+
+1. EXECUTIVE AUDIT SUMMARY
+--------------------------
+Our algorithmic monitoring detected an acute discrepancy between your public
+star rating and authentic post-purchase customer feedback:
+  * Public Marketplace Rating  : ⭐ 4.00 / 5.00 (Deceptively High)
+  * Analyzed Negative Reviews   : 🔴 50.0% (1 recorded severe failures)
+  * Customer Dissatisfaction Upvotes : 42 helpful votes from other buyers
+  * Dominant Root-Cause Driver  : [SIZE & COMPATIBILITY]
+
+CONCLUSION: Your public star rating does not reflect recent manufacturing quality. 
+Initial ratings mask ongoing durability degradation.
+
+2. VERIFIED CUSTOMER COMPLAINT EVIDENCE (FORENSIC LOG)
+------------------------------------------------------
+  [EVIDENCE RECORD #1]
+    - Assigned Stars : ⭐ 3.0 / 5.0 (Verified Buyer: False)
+    - Other Buyers Upvoted : 42 Helpful Votes
+    - Subject Line   : "If I could, I would get something else"
+    - Ground Truth Statement:
+      "Had to replace the dishwasher in a new house. Looked into many models, and decided to go with this model (bought at a local BestBuy). Used for 5 months prior to writing this review.<br /><br />Pros:<br />1. Washes dishes well.<br />2. Supposedly saves water (not sure if I can check this claim, so I am taking it as is)<br />3. Supposedly saves energy cause it's not using dry-heat at the end of the cycle but rather FINISH rinse agent (more on it in #3 of Cons)<br />4. Nice looks and easy to operate. Mainly use the AUTO wash - set it and forget it. Also we use 3hr delay so we don't get bothered with noise (later about the noise).<br /><br />Cons:<br />1. It is much smaller than other dishwashers we have owned and/or operated (primarily Kenmoore and Whirlpool). I think this Bosch's basic model was made smaller on purpose to make you buy a more advanced washer that is sized properly. For a family of 3, we turn the dishwasher on at least every other day, sometomes daily (when we have guests and such)<br />2. Maybe I got a defective dishwasher, but mine is NOT QUITE. Again, I compare with kenmoores and whirlpools that I have used and/or  owned. We set the 3-hr delay so that in the evening we can watch the TV in the living room without having to turn the volume up.<br />3. This dishwasher goes though FINISH [[ASIN:B0026WRHK6 Finish Jet-dry Rinse Agent, Original Liquid, 32 Oz]] lightning fast. We set the use of FINISH to the lowest, but the LOW indicator lights up every three or so weeks. Maybe the dishwasher is saving water (see #2 in pros above) and energy (see #3 in pros above), but last time I checked water is much cheaper than FINISH liquid. With Kenmoore, we had to refill the liquid no often than once every 3-4 months.<br /><br />All things considered, we aren't getting anymore BOSCHs. Next time around I am getting a Kenmoore from Sears. They all are regular sizes and don't consume FINISH at lightning speeds."
+--------------------------------------------------------------------------------
+
+3. MANDATORY CORRECTIVE ACTIONS
+-------------------------------
+To maintain active listing eligibility on the catalog, you must submit:
+  [ ] Batch Material Testing Certificate addressing [Size & Compatibility].
+  [ ] Dimension / Fitment Verification Report ensuring accurate specification.
+  [ ] Remediation roadmap for inventory manufactured after recent quality decay.
+
+Failure to respond within 14 business days will result in automated de-ranking 
+and permanent placement under the "Misleading Quality Trap" quarantine segment.
+
+ISSUED BY:
+Aislewise Product Integrity & Discrepancy Forensic Engine
+Contact: integrity-ops@aislewise.internal
+================================================================================
