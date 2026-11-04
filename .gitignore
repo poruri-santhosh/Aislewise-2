@@ -15,3 +15,5 @@ data_postgresql/
 data_mongodb/
 analytics_exports/
 *.log
+.vercel
+.env*

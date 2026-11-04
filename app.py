@@ -12,7 +12,7 @@ from psycopg2.extras import RealDictCursor
 BASE_DIR = Path(__file__).resolve().parent
 load_dotenv(BASE_DIR / ".env")
 
-app = Flask(__name__, template_folder="templates", static_folder="static")
+app = Flask(__name__, template_folder="templates", static_folder="public/static")
 
 
 class DatabaseConfigurationError(RuntimeError):
@@ -222,4 +222,13 @@ def reviews():
         page_size=page_size,
         total=total,
         total_pages=max(1, (total + page_size - 1) // page_size),
+    )
+
+
+if __name__ == "__main__":
+    debug = os.getenv("FLASK_DEBUG", "").strip().lower() in {"1", "true", "yes"}
+    app.run(
+        host=os.getenv("FLASK_HOST", "127.0.0.1"),
+        port=int(os.getenv("PORT", "5000")),
+        debug=debug,
     )

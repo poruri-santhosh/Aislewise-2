@@ -1,24 +1,8 @@
 {
-  "version": 2,
-  "builds": [
-    {
-      "src": "api/index.py",
-      "use": "@vercel/python"
-    }
-  ],
-  "routes": [
-    {
-      "src": "/(.*)",
-      "dest": "/api/index.py"
-    }
-  ],
+  "$schema": "https://openapi.vercel.sh/vercel.json",
   "functions": {
-    "api/index.py": {
-      "includeFiles": [
-        "app.py",
-        "templates/**",
-        "static/**"
-      ]
+    "app.py": {
+      "includeFiles": "templates/**"
     }
   }
 }
