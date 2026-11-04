@@ -618,11 +618,25 @@ checkoutForm.addEventListener("submit", async (event) => {
       body: JSON.stringify(payload),
     });
     const data = await response.json();
-    if (!response.ok) throw new Error(data.error || "Feedback could not be saved.");
+    if (!response.ok) {
+    throw new Error(data.error || "Feedback could not be saved.");
+}
 
-    const emptyState = feedbackList.querySelector(".shopper-feedback-empty, .shopper-feedback-error");
-    if (emptyState) emptyState.remove();
-    renderShopperFeedback(data.review, true);
+console.log("Shopper feedback API response:", data);
+
+if (!data.review || typeof data.review !== "object") {
+    throw new Error(
+        "Feedback was received, but the API did not return the saved review. Check the Flask response."
+    );
+}
+
+const emptyState = feedbackList.querySelector(
+    ".shopper-feedback-empty, .shopper-feedback-error"
+);
+
+if (emptyState) emptyState.remove();
+
+renderShopperFeedback(data.review, true);
     const priorCount = Number.parseInt(feedbackCount.textContent, 10) || 0;
     feedbackCount.textContent = `${formatNumber(priorCount + 1)} ${priorCount === 0 ? "review" : "reviews"}`;
     checkoutForm.reset();
