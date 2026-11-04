@@ -1,16 +1,24 @@
 import os
+import sys
+from pathlib import Path
 import duckdb
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 
-DUCKDB_PATH = "warehouse.duckdb"
-OUTPUT_DIR = "Scenario_B"
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(PROJECT_ROOT))
+from Scenario_A.scenario_mlflow import register_ml_reviews
+
+DUCKDB_PATH = PROJECT_ROOT / "warehouse.duckdb"
+OUTPUT_DIR = Path(__file__).resolve().parent
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
 def run_scenario_b_base():
-    con = duckdb.connect(DUCKDB_PATH, read_only=True)
+    con = duckdb.connect(DUCKDB_PATH)
     sns.set_theme(style="whitegrid")
+    register_ml_reviews(con)
 
     print("=" * 65)
     print(" SCENARIO B - STEP 1: BASELINE DETECTION & SEGMENT FILTER ")
@@ -26,28 +34,26 @@ def run_scenario_b_base():
             positive_pct,
             negative_pct,
             pos_count,
-            neg_count
-        FROM gold_product_discrepancy_flags
+            neg_count,
+            COALESCE(avg_ml_confidence, 1.0) AS avg_ml_confidence
+        FROM gold_product_discrepancy_flags_ml
         WHERE flag = 'INVESTIGATE_SCENARIO_B'
         ORDER BY total_reviews DESC, positive_pct DESC;
     """
     df_b = con.execute(query).df()
     print(f"\nTotal Scenario B Products Detected: {len(df_b):,}")
 
-    if df_b.empty:
-        print("No products matched Scenario B criteria.")
-        con.close()
-        return
-
     # 2. Portfolio-level Stats for Scenario B
     avg_rating = df_b["avg_star_rating"].mean()
     avg_pos = df_b["positive_pct"].mean()
     avg_reviews = df_b["total_reviews"].mean()
+    avg_confidence = df_b["avg_ml_confidence"].mean()
 
     print("\nScenario B Segment Overview:")
     print(f"  * Average Displayed Rating : ⭐ {avg_rating:.2f} / 5.0")
     print(f"  * Average Positive Share   : 🟢 {avg_pos:.1f}%")
     print(f"  * Average Review Volume    : 📦 {avg_reviews:.1f} reviews per product")
+    print(f"  * Average ML Confidence    : {avg_confidence:.1%}")
 
     print("\nTop 5 Detected Products:")
     print(df_b.head(5).to_string(index=False))
@@ -93,7 +99,7 @@ def run_scenario_b_base():
         fontsize=11, bbox=dict(boxstyle='round,pad=0.6', facecolor='#f8f9fa', edgecolor='#bdc3c7')
     )
 
-    chart_file = os.path.join(OUTPUT_DIR, "chart_scenario_b_base.png")
+    chart_file = OUTPUT_DIR / "chart_scenario_b_base.png"
     plt.tight_layout()
     plt.savefig(chart_file, dpi=300, bbox_inches='tight')
     print(f"\nSaved Baseline Chart: {chart_file}")

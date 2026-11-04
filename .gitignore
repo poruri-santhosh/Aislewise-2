@@ -1,19 +1,32 @@
+# Environment files and virtual environments
 .env
 .env.*
 !.env.example
-.vercel/
-.streamlit/secrets.toml
-__pycache__/
-.pytest_cache/
 .venv/
 venv/
+
+# Python and test caches
+__pycache__/
 *.py[cod]
+.pytest_cache/
+
+# Local deployment configuration
+.vercel/
+.streamlit/secrets.toml
+
+# Local databases and MLflow artifacts
 *.duckdb
 *.duckdb.wal
 !warehouse.duckdb
+mlflow.db
+mlruns/
+
+# Local datasets and generated exports
 data_postgresql/
 data_mongodb/
 analytics_exports/
+
+# Logs and operating-system files
 *.log
-.vercel
-.env*
+.DS_Store
+Thumbs.db

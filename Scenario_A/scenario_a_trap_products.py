@@ -1,13 +1,22 @@
+import sys
+from pathlib import Path
 import duckdb
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 
-DUCKDB_PATH = "warehouse.duckdb"
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(PROJECT_ROOT))
+from Scenario_A.scenario_mlflow import register_ml_reviews
+
+DUCKDB_PATH = PROJECT_ROOT / "warehouse.duckdb"
+OUTPUT_DIR = Path(__file__).resolve().parent
 
 def run_scenario_a():
     con = duckdb.connect(DUCKDB_PATH)
     sns.set_theme(style="whitegrid")
+    register_ml_reviews(con)
 
     print("==================================================")
     print(" SCENARIO A: DANGEROUS TRAP PRODUCTS (AUDIT) ")
@@ -23,7 +32,7 @@ def run_scenario_a():
             positive_pct,
             neg_count,
             pos_count
-        FROM gold_product_discrepancy_flags
+        FROM gold_product_discrepancy_flags_ml
         WHERE avg_star_rating >= 4.0 AND negative_pct >= 35.0
         ORDER BY total_reviews DESC, negative_pct DESC;
     """
@@ -65,8 +74,9 @@ def run_scenario_a():
                 fontsize=11, bbox=dict(boxstyle='round,pad=0.6', facecolor='#f8f9fa', edgecolor='#bdc3c7'))
 
     plt.tight_layout()
-    plt.savefig("chart_scenario_a.png", dpi=300, bbox_inches='tight')
-    print("\nVisualization saved to: chart_scenario_a.png")
+    chart_path = OUTPUT_DIR / "chart_scenario_a.png"
+    plt.savefig(chart_path, dpi=300, bbox_inches='tight')
+    print(f"\nVisualization saved to: {chart_path}")
     con.close()
 
 if __name__ == "__main__":

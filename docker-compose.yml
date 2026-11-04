@@ -1,0 +1,19 @@
+version: "3.8"
+
+services:
+  aislewise-dashboard:
+    build: .
+    container_name: aislewise_app
+    ports:
+      - "8501:8501"
+    volumes:
+      - ./warehouse.duckdb:/app/warehouse.duckdb
+      - ./mlflow.db:/app/mlflow.db
+      - ./mlruns:/app/mlruns
+      - ./Scenario_A:/app/Scenario_A
+      - ./Scenario_B:/app/Scenario_B
+      - ./Scenario_C:/app/Scenario_C
+    environment:
+      PYTHONUNBUFFERED: "1"
+      MLFLOW_TRACKING_URI: sqlite:////app/mlflow.db
+    restart: unless-stopped

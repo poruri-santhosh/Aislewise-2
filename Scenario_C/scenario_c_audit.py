@@ -1,16 +1,24 @@
 import os
+import sys
+from pathlib import Path
 import duckdb
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 
-DUCKDB_PATH = "warehouse.duckdb"
-OUTPUT_DIR = "Scenario_C"
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(PROJECT_ROOT))
+from Scenario_A.scenario_mlflow import register_ml_reviews
+
+DUCKDB_PATH = PROJECT_ROOT / "warehouse.duckdb"
+OUTPUT_DIR = Path(__file__).resolve().parent
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
 def run_scenario_c_audit():
     con = duckdb.connect(DUCKDB_PATH)
     sns.set_theme(style="whitegrid")
+    register_ml_reviews(con)
 
     print("=" * 65)
     print(" SCENARIO C: CONSISTENTLY POOR PRODUCTS (CATALOG PURGE AUDIT) ")
@@ -27,19 +35,15 @@ def run_scenario_c_audit():
             f.negative_pct,
             f.positive_pct,
             f.neg_count,
-            f.pos_count
-        FROM gold_product_discrepancy_flags f
+            f.pos_count,
+            COALESCE(f.avg_ml_confidence, 1.0) AS avg_ml_confidence
+        FROM gold_product_discrepancy_flags_ml f
         LEFT JOIN bronze_products p ON f.product_id = p.product_id
         WHERE f.avg_star_rating <= 2.5 AND f.negative_pct >= 60.0
         ORDER BY f.total_reviews DESC, f.negative_pct DESC;
     """
     df_lemons = con.execute(query).df()
     print(f"\nTotal Confirmed Lemon Products Flagged: {len(df_lemons):,}")
-
-    if df_lemons.empty:
-        print("No products matched the exact Scenario C threshold.")
-        con.close()
-        return
 
     # Save to Gold layer
     con.execute("CREATE OR REPLACE TABLE gold_scenario_c_catalog_purge AS SELECT * FROM df_lemons;")
@@ -55,19 +59,19 @@ def run_scenario_c_audit():
     print(df_lemons[["product_id", "total_reviews", "avg_star_rating", "negative_pct", "neg_count"]].head(5).to_string(index=False))
 
     # 3. Sample Case Evidence (Direct Severe Review Quotes)
-    p_ids = tuple(df_lemons["product_id"].tolist())
-    p_filter = f"('{p_ids[0]}')" if len(p_ids) == 1 else str(p_ids)
-
-    complaints_query = f"""
+    con.register("scenario_c_products", df_lemons[["product_id"]])
+    complaints_query = """
         SELECT 
-            product_id,
-            rating,
-            title,
-            text,
-            helpful_vote
-        FROM silver_reviews
-        WHERE product_id IN {p_filter} AND sentiment = 'negative'
-        ORDER BY helpful_vote DESC, rating ASC
+            r.product_id,
+            r.rating,
+            r.title,
+            r.text,
+            r.helpful_vote,
+            COALESCE(r.ml_confidence, 1.0) AS ml_confidence
+        FROM silver_reviews_ml AS r
+        INNER JOIN scenario_c_products AS p ON r.product_id = p.product_id
+        WHERE r.sentiment = 'negative'
+        ORDER BY r.helpful_vote DESC, r.rating ASC
         LIMIT 3;
     """
     df_complaints = con.execute(complaints_query).df()

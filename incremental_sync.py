@@ -121,35 +121,7 @@ def run_sync_cycle():
     """, records_to_insert)
 
     # 5. Refresh Gold Aggregations & Discrepancy Flags
-    con_duck.execute("""
-        CREATE OR REPLACE TABLE gold_product_discrepancy_flags AS
-        WITH stats AS (
-            SELECT 
-                product_id,
-                COUNT(*) as total_reviews,
-                AVG(rating) as avg_star_rating,
-                COUNT(CASE WHEN sentiment = 'negative' THEN 1 END) as neg_count,
-                COUNT(CASE WHEN sentiment = 'positive' THEN 1 END) as pos_count,
-                COUNT(CASE WHEN sentiment = 'neutral' THEN 1 END) as neu_count
-            FROM silver_reviews
-            GROUP BY product_id
-        )
-        SELECT 
-            product_id,
-            total_reviews,
-            ROUND(avg_star_rating, 2) AS avg_star_rating,
-            neg_count,
-            pos_count,
-            neu_count,
-            ROUND((neg_count * 100.0 / total_reviews), 2) AS negative_pct,
-            ROUND((pos_count * 100.0 / total_reviews), 2) AS positive_pct,
-            CASE 
-                WHEN avg_star_rating >= 4.0 AND (neg_count * 100.0 / total_reviews) >= 35.0 THEN 'INVESTIGATE_SCENARIO_A'
-                WHEN avg_star_rating <= 3.0 AND (pos_count * 100.0 / total_reviews) >= 65.0 THEN 'INVESTIGATE_SCENARIO_B'
-                ELSE 'NORMAL'
-            END AS flag
-        FROM stats;
-    """)
+    _build_gold_flags(con_duck)
 
     # 6. Save updated checkpoint
     con_duck.execute("""
@@ -161,11 +133,65 @@ def run_sync_cycle():
     con_duck.close()
     return len(records_to_insert)
 
+def _build_gold_flags(con_duck):
+    """
+    Rebuild gold_product_discrepancy_flags from scratch using silver_reviews.
+
+    Flag logic (matches scenario_mlflow.py runtime thresholds):
+      INVESTIGATE_SCENARIO_A : avg_star_rating >= 4.0 AND negative_pct >= 35.0
+      INVESTIGATE_SCENARIO_B : avg_star_rating <= 3.0 AND positive_pct >= 65.0
+      INVESTIGATE_SCENARIO_C : avg_star_rating <= 2.5 AND negative_pct >= 60.0
+      NORMAL                 : everything else
+
+    avg_ml_confidence is stored as NULL because the incremental-sync worker uses
+    keyword-based sentiment (fast_sentiment_rule), not the MLflow model.  The
+    Streamlit dashboard and scenario scripts override this column at runtime via
+    COALESCE(avg_ml_confidence, 1.0) on the ML-scored temp table.
+    """
+    con_duck.execute("""
+        CREATE OR REPLACE TABLE gold_product_discrepancy_flags AS
+        WITH stats AS (
+            SELECT
+                product_id,
+                COUNT(*)                                                    AS total_reviews,
+                AVG(rating)                                                 AS avg_star_rating,
+                COUNT(CASE WHEN sentiment = 'negative' THEN 1 END)          AS neg_count,
+                COUNT(CASE WHEN sentiment = 'positive' THEN 1 END)          AS pos_count,
+                COUNT(CASE WHEN sentiment = 'neutral'  THEN 1 END)          AS neu_count,
+                ROUND(COUNT(CASE WHEN sentiment = 'negative' THEN 1 END) * 100.0 / COUNT(*), 2) AS negative_pct,
+                ROUND(COUNT(CASE WHEN sentiment = 'positive' THEN 1 END) * 100.0 / COUNT(*), 2) AS positive_pct
+            FROM silver_reviews
+            GROUP BY product_id
+        )
+        SELECT
+            product_id,
+            total_reviews,
+            ROUND(avg_star_rating, 2)        AS avg_star_rating,
+            neg_count,
+            pos_count,
+            neu_count,
+            negative_pct,
+            positive_pct,
+            -- avg_ml_confidence is NULL here; filled at runtime by ML scoring
+            CAST(NULL AS DOUBLE)             AS avg_ml_confidence,
+            CASE
+                WHEN avg_star_rating >= 4.0 AND negative_pct >= 35.0
+                    THEN 'INVESTIGATE_SCENARIO_A'
+                WHEN avg_star_rating <= 3.0 AND positive_pct >= 65.0
+                    THEN 'INVESTIGATE_SCENARIO_B'
+                WHEN avg_star_rating <= 2.5 AND negative_pct >= 60.0
+                    THEN 'INVESTIGATE_SCENARIO_C'
+                ELSE 'NORMAL'
+            END AS flag
+        FROM stats
+    """)
+
+
 if __name__ == "__main__":
     init_duckdb()
     print("DuckDB Tables initialized.")
     print("Incremental Sync Worker started! Polling Postgres every 10s...")
-    
+
     while True:
         try:
             count = run_sync_cycle()

@@ -1,67 +1,34 @@
 import os
+import sys
+from pathlib import Path
 import duckdb
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 
-DUCKDB_PATH = "warehouse.duckdb"
-OUTPUT_DIR = "Scenario_B"
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(PROJECT_ROOT))
+from Scenario_A.scenario_mlflow import register_ml_reviews, register_scenario_b_forensics
+
+DUCKDB_PATH = PROJECT_ROOT / "warehouse.duckdb"
+OUTPUT_DIR = Path(__file__).resolve().parent
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
 def run_scenario_b_forensics():
     con = duckdb.connect(DUCKDB_PATH)
     sns.set_theme(style="whitegrid")
+    register_ml_reviews(con)
+    register_scenario_b_forensics(con)
 
     print("=" * 65)
     print(" SCENARIO B - STEP 2: DIAGNOSTIC & RATING SABOTAGE AUDIT ")
     print("=" * 65)
 
-    # 1. Forensic Classification Query
-    query = """
-        WITH review_stats AS (
-            SELECT 
-                r.product_id,
-                COUNT(*) as total_reviews,
-                ROUND(AVG(r.rating), 2) as avg_rating,
-                COUNT(CASE WHEN r.rating >= 4.0 THEN 1 END) as star_4_5_count,
-                COUNT(CASE WHEN r.rating <= 2.0 THEN 1 END) as star_1_2_count,
-                COUNT(CASE WHEN r.verified_purchase = TRUE THEN 1 END) as verified_count,
-                COUNT(CASE WHEN r.verified_purchase = FALSE THEN 1 END) as unverified_count,
-                COUNT(CASE WHEN r.verified_purchase = FALSE AND r.rating <= 2.0 THEN 1 END) as unverified_bad_ratings,
-                ROUND(COUNT(CASE WHEN r.sentiment = 'positive' THEN 1 END) * 100.0 / COUNT(*), 1) as positive_pct,
-                ROUND(COALESCE(VAR_SAMP(r.rating), 0), 2) as rating_variance
-            FROM silver_reviews r
-            JOIN gold_product_discrepancy_flags f ON r.product_id = f.product_id
-            WHERE f.flag = 'INVESTIGATE_SCENARIO_B'
-            GROUP BY r.product_id
-        )
-        SELECT 
-            product_id,
-            total_reviews,
-            avg_rating,
-            positive_pct,
-            star_4_5_count,
-            star_1_2_count,
-            verified_count,
-            unverified_count,
-            unverified_bad_ratings,
-            rating_variance,
-            CASE 
-                -- 1. Unverified 1-star review dragged down verified 5-stars
-                WHEN unverified_bad_ratings > 0 AND star_4_5_count >= 2 
-                    THEN 'Suspected Review Bombing (Unverified 1-Star)'
-                -- 2. Very few reviews (2-3 total)
-                WHEN total_reviews <= 3 
-                    THEN 'Sample Size Truncation (Under-reviewed)'
-                -- 3. Sharp split opinion (1 vs 5 Stars)
-                WHEN rating_variance >= 2.0 
-                    THEN 'Polarized Opinions (1 vs 5 Stars)'
-                ELSE 'Genuine Hidden Gem'
-            END AS forensic_verdict
-        FROM review_stats
-        ORDER BY total_reviews DESC, positive_pct DESC;
-    """
-    df_forensics = con.execute(query).df()
+    # 1. Model-powered Forensic Classification
+    df_forensics = con.execute(
+        "SELECT * FROM scenario_b_forensics_ml ORDER BY total_reviews DESC, positive_pct DESC"
+    ).df()
     print(f"Total Scenario B Products Evaluated: {len(df_forensics)}")
 
     # Save to DuckDB Gold layer
@@ -89,19 +56,19 @@ def run_scenario_b_forensics():
         print(f"\nCase #{idx+1} | Product: {p_id} | Stars: {row['avg_rating']} / 5.0 | Positive Share: {row['positive_pct']}%")
         print(f"  Verdict: {row['forensic_verdict']} | Total Reviews: {row['total_reviews']}")
 
-        pos_rev = con.execute(f"""
+        pos_rev = con.execute("""
             SELECT rating, title, text 
-            FROM silver_reviews 
-            WHERE product_id = '{p_id}' AND sentiment = 'positive' 
+            FROM silver_reviews_ml 
+            WHERE product_id = ? AND sentiment = 'positive' 
             LIMIT 1;
-        """).fetchone()
+        """, [p_id]).fetchone()
 
-        neg_rev = con.execute(f"""
+        neg_rev = con.execute("""
             SELECT rating, title, text, verified_purchase 
-            FROM silver_reviews 
-            WHERE product_id = '{p_id}' AND sentiment = 'negative' 
+            FROM silver_reviews_ml 
+            WHERE product_id = ? AND sentiment = 'negative' 
             LIMIT 1;
-        """).fetchone()
+        """, [p_id]).fetchone()
 
         if pos_rev:
             print(f"  Positive Feedback ({pos_rev[0]} Stars): \"{pos_rev[1]}\" -> {str(pos_rev[2])[:80]}...")
@@ -148,7 +115,7 @@ def run_scenario_b_forensics():
         fontsize=11, bbox=dict(boxstyle='round,pad=0.6', facecolor='#f8f9fa', edgecolor='#bdc3c7')
     )
 
-    chart_file = os.path.join(OUTPUT_DIR, "chart_scenario_b_forensics.png")
+    chart_file = OUTPUT_DIR / "chart_scenario_b_forensics.png"
     plt.tight_layout()
     plt.savefig(chart_file, dpi=300, bbox_inches='tight')
     print(f"\nSaved Chart: {chart_file}")

@@ -1,8 +1,12 @@
 import duckdb
 import pandas as pd
 import datetime
+from pathlib import Path
 
-DUCKDB_PATH = "warehouse.duckdb"
+PROJECT_ROOT = Path(__file__).resolve().parent
+if PROJECT_ROOT.name == "scripts":
+    PROJECT_ROOT = PROJECT_ROOT.parent
+DUCKDB_PATH = PROJECT_ROOT / "warehouse.duckdb"
 
 def classify_root_cause(text, title=""):
     full_text = f"{title} {text}".lower()

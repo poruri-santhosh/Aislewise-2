@@ -1,15 +1,23 @@
 import os
+import sys
 import json
+from pathlib import Path
 import duckdb
 import pandas as pd
 from datetime import datetime
 
-DUCKDB_PATH = "warehouse.duckdb"
-OUTPUT_DIR = os.path.join("Scenario_A", "vendor_memos")
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(PROJECT_ROOT))
+from Scenario_A.scenario_mlflow import register_ml_reviews
+
+DUCKDB_PATH = PROJECT_ROOT / "warehouse.duckdb"
+OUTPUT_DIR = Path(__file__).resolve().parent / "vendor_memos"
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
 def generate_vendor_memos():
-    con = duckdb.connect(DUCKDB_PATH)
+    con = duckdb.connect(DUCKDB_PATH, read_only=True)
+    register_ml_reviews(con)
 
     print("=" * 65)
     print(" SCENARIO A: AUTOMATED VENDOR ACTION MEMO GENERATOR ")
@@ -24,7 +32,8 @@ def generate_vendor_memos():
             i.negative_pct,
             i.total_neg_reviews,
             i.total_complaint_upvotes,
-            i.weighted_dissatisfaction_score
+            i.weighted_dissatisfaction_score,
+            COALESCE(i.avg_confidence, 1.0) AS avg_confidence
         FROM gold_scenario_a_impact_ranking i
         LEFT JOIN bronze_products p ON i.product_id = p.product_id
         ORDER BY i.weighted_dissatisfaction_score DESC
@@ -43,30 +52,50 @@ def generate_vendor_memos():
         neg_count = row["total_neg_reviews"]
         upvotes = row["total_complaint_upvotes"]
 
-        # Fetch Top Root-Cause Driver
-        rc_query = f"""
-            SELECT root_cause, COUNT(*) as cnt
-            FROM gold_scenario_a_root_causes
-            WHERE product_id = '{p_id}'
-            GROUP BY root_cause
-            ORDER BY cnt DESC
+        # Prefer reviewed failure categories, with validated schema fallbacks.
+        rc_query = """
+            WITH cause_evidence AS (
+                SELECT NULLIF(TRIM(root_cause), '') AS cause, COUNT(*) AS cnt, 1 AS priority
+                FROM gold_scenario_a_root_causes
+                WHERE product_id = ?
+                GROUP BY root_cause
+                UNION ALL
+                SELECT NULLIF(TRIM(issue_category), '') AS cause, COUNT(*) AS cnt, 2 AS priority
+                FROM gold_scenario_a_severe_complaints
+                WHERE product_id = ?
+                GROUP BY issue_category
+                UNION ALL
+                SELECT NULLIF(TRIM(appliance_category), '') AS cause, COUNT(*) AS cnt, 3 AS priority
+                FROM gold_scenario_a_durability
+                WHERE product_id = ?
+                GROUP BY appliance_category
+                UNION ALL
+                SELECT NULLIF(TRIM(failure_timeframe), '') AS cause, COUNT(*) AS cnt, 4 AS priority
+                FROM gold_scenario_a_durability
+                WHERE product_id = ?
+                GROUP BY failure_timeframe
+            )
+            SELECT cause
+            FROM cause_evidence
+            WHERE cause IS NOT NULL
+            ORDER BY priority, cnt DESC, cause
             LIMIT 1;
         """
-        rc_res = con.execute(rc_query).fetchone()
-        primary_defect = rc_res[0] if rc_res else "Unspecified Mechanical / Material Failure"
+        rc_res = con.execute(rc_query, [p_id, p_id, p_id, p_id]).fetchone()
+        primary_defect = rc_res[0] if rc_res else "Unspecified Appliance Component"
 
         # Fetch Verified Customer Evidence Quotes
-        quotes_query = f"""
+        quotes_query = """
             SELECT rating, title, text, helpful_vote, verified_purchase
-            FROM silver_reviews
-            WHERE product_id = '{p_id}' AND sentiment = 'negative'
+            FROM silver_reviews_ml
+            WHERE product_id = ? AND sentiment = 'negative'
             ORDER BY helpful_vote DESC, rating ASC
             LIMIT 3;
         """
-        quotes = con.execute(quotes_query).fetchall()
+        quotes = con.execute(quotes_query, [p_id]).fetchall()
 
         memo_filename = f"VENDOR_NOTICE_{p_id}.txt"
-        memo_path = os.path.join(OUTPUT_DIR, memo_filename)
+        memo_path = OUTPUT_DIR / memo_filename
         current_date = datetime.now().strftime("%B %d, %Y")
 
         memo_content = f"""================================================================================
@@ -138,7 +167,7 @@ Contact: integrity-ops@aislewise.internal
         })
 
     # Save summary JSON
-    summary_json_path = os.path.join(OUTPUT_DIR, "vendor_notices_index.json")
+    summary_json_path = OUTPUT_DIR / "vendor_notices_index.json"
     with open(summary_json_path, "w", encoding="utf-8") as jf:
         json.dump(memos_summary, jf, indent=2)
 

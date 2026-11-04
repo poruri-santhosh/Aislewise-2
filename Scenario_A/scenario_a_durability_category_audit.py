@@ -1,12 +1,19 @@
 import os
 import re
+import sys
+from pathlib import Path
 import duckdb
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 
-DUCKDB_PATH = "warehouse.duckdb"
-OUTPUT_DIR = "Scenario_A"
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(PROJECT_ROOT))
+from Scenario_A.scenario_mlflow import register_ml_reviews
+
+DUCKDB_PATH = PROJECT_ROOT / "warehouse.duckdb"
+OUTPUT_DIR = Path(__file__).resolve().parent
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
 def detect_failure_timeframe(text):
@@ -43,6 +50,7 @@ def tag_appliance_category(title, text):
 def run_durability_and_category_audit():
     con = duckdb.connect(DUCKDB_PATH)
     sns.set_theme(style="whitegrid")
+    register_ml_reviews(con)
 
     print("=" * 65)
     print(" SCENARIO A: DURABILITY TIMELINE & PART CATEGORY AUDIT ")
@@ -56,11 +64,12 @@ def run_durability_and_category_audit():
             p.title as product_title,
             r.rating,
             r.text,
-            r.helpful_vote
-        FROM silver_reviews r
-        JOIN gold_product_discrepancy_flags f ON r.product_id = f.product_id
+            r.helpful_vote,
+            COALESCE(r.ml_confidence, 0.0) AS ml_confidence
+        FROM silver_reviews_ml r
+        JOIN gold_product_discrepancy_flags_ml f ON r.product_id = f.product_id
         LEFT JOIN bronze_products p ON r.product_id = p.product_id
-        WHERE f.flag = 'INVESTIGATE_SCENARIO_A' AND r.sentiment = 'negative';
+        WHERE f.flag = 'INVESTIGATE_SCENARIO_A' AND LOWER(r.sentiment) = 'negative';
     """
     df_reviews = con.execute(query).df()
     print(f"Total Negative Reviews Analyzed in Scenario A: {len(df_reviews):,}")

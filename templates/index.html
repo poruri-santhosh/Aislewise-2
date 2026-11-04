@@ -4,11 +4,8 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="theme-color" content="#f5f7f4">
-    <meta name="description" content="Search and explore every Aislewise customer product review.">
-    <title>Aislewise | Customer Review Intelligence</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <meta name="description" content="Explore Aislewise product reviews or plan a smarter grocery trip.">
+    <title>Aislewise | Product Intelligence and Shopper Navigation</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
     <script src="{{ url_for('static', filename='js/reviews.js') }}" defer></script>
   </head>
@@ -18,15 +15,19 @@
         <span class="brand-mark" aria-hidden="true">A</span>
         <span>aislewise<span class="brand-period">.</span></span>
       </a>
-      <div class="topbar-status"><span class="status-dot"></span> PRODUCT INTELLIGENCE</div>
+      <nav class="mode-switcher" role="tablist" aria-label="Aislewise modes">
+        <button id="product-mode-tab" class="mode-tab is-active" type="button" role="tab" aria-selected="true" aria-controls="product-mode">Product Intelligence</button>
+        <button id="shopper-mode-tab" class="mode-tab" type="button" role="tab" aria-selected="false" aria-controls="shopper-mode">Shopper Navigation</button>
+      </nav>
     </header>
 
     <main class="page-shell">
-      <section class="hero">
+      <section id="product-mode" class="mode-panel" role="tabpanel" aria-labelledby="product-mode-tab">
+        <section class="hero">
         <p class="eyebrow">CUSTOMER VOICE, MADE CLEAR</p>
         <h1>Every review.<br><span>One clear view.</span></h1>
         <p class="hero-copy">Explore the complete product review catalogue. Search review text, find a product, and filter by rating or verified purchase.</p>
-      </section>
+        </section>
 
       <section class="metrics" aria-label="Review catalogue summary">
         <article class="metric-card">
@@ -106,6 +107,16 @@
         </form>
 
         <div id="error-message" class="error-message" role="alert" hidden></div>
+        <section class="shopper-feedback" aria-labelledby="shopper-feedback-title">
+          <div class="shopper-feedback-heading">
+            <div>
+              <p class="eyebrow">IN-STORE EXPERIENCE</p>
+              <h3 id="shopper-feedback-title">Shopper feedback</h3>
+            </div>
+            <span id="shopper-feedback-count" class="results-count" aria-live="polite"></span>
+          </div>
+          <div id="shopper-feedback-list" class="shopper-feedback-list" aria-live="polite"></div>
+        </section>
         <div id="review-list" class="review-list" aria-live="polite" aria-busy="true"></div>
         <nav class="pagination" aria-label="Review pages">
           <span id="page-status" class="page-status">Page 1 of 1</span>
@@ -115,11 +126,146 @@
           </div>
         </nav>
       </section>
+      </section>
+
+      <section id="shopper-mode" class="mode-panel shopper-mode" role="tabpanel" aria-labelledby="shopper-mode-tab" hidden>
+        <div class="shopper-hero">
+          <div>
+            <p class="eyebrow">PLAN YOUR GROCERY RUN</p>
+            <h1>Shop smarter.<br><span>Walk less.</span></h1>
+            <p class="hero-copy">Build a cart and find a clear route through the store. Your route is planned right here in your browser.</p>
+          </div>
+          <div class="trip-badge"><span class="status-dot"></span> IN-STORE MODE</div>
+        </div>
+
+        <div class="shopper-layout">
+          <aside class="shopper-sidebar">
+            <section class="shopper-card" aria-labelledby="products-title">
+              <div class="panel-heading">
+                <div>
+                  <p class="eyebrow">AISLEWISE MARKET</p>
+                  <h2 id="products-title">Grocery list</h2>
+                </div>
+                <span class="panel-count">4 items</span>
+              </div>
+              <div id="product-catalog" class="product-catalog">
+                <article class="grocery-item" data-product-id="milk">
+                  <div class="grocery-icon" aria-hidden="true">🥛</div>
+                  <div class="grocery-details"><h3>Whole Milk</h3><span>Aisle 2 · Dairy</span><strong>$3.79</strong></div>
+                  <button class="add-to-cart" type="button" data-add-to-cart="milk">Add</button>
+                </article>
+                <article class="grocery-item" data-product-id="bread">
+                  <div class="grocery-icon" aria-hidden="true">🍞</div>
+                  <div class="grocery-details"><h3>Sourdough Bread</h3><span>Aisle 1 · Bakery</span><strong>$5.49</strong></div>
+                  <button class="add-to-cart" type="button" data-add-to-cart="bread">Add</button>
+                </article>
+                <article class="grocery-item" data-product-id="coffee">
+                  <div class="grocery-icon" aria-hidden="true">☕</div>
+                  <div class="grocery-details"><h3>Arabica Coffee</h3><span>Aisle 3 · Coffee</span><strong>$12.99</strong></div>
+                  <button class="add-to-cart" type="button" data-add-to-cart="coffee">Add</button>
+                </article>
+                <article class="grocery-item" data-product-id="oats">
+                  <div class="grocery-icon" aria-hidden="true">🌾</div>
+                  <div class="grocery-details"><h3>Organic Oats</h3><span>Aisle 2 · Breakfast</span><strong>$4.29</strong></div>
+                  <button class="add-to-cart" type="button" data-add-to-cart="oats">Add</button>
+                </article>
+              </div>
+            </section>
+
+            <section class="shopper-card cart-card" aria-labelledby="cart-title">
+              <div class="panel-heading">
+                <div>
+                  <p class="eyebrow">YOUR TRIP</p>
+                  <h2 id="cart-title">Live cart</h2>
+                </div>
+                <span id="cart-count" class="panel-count">0 items</span>
+              </div>
+              <div id="cart-list" class="cart-list">
+                <p class="cart-empty">Your cart is empty. Add a grocery item to get started.</p>
+              </div>
+              <div class="cart-total"><span>Estimated total</span><strong id="cart-total">$0.00</strong></div>
+              <button id="find-route" class="primary-button route-button" type="button" disabled>Find Shortest Route</button>
+              <button id="finish-shopping" class="secondary-button finish-button" type="button" disabled>Finish Shopping</button>
+              <p id="cart-status" class="cart-status" aria-live="polite">Add items to plan your route.</p>
+            </section>
+          </aside>
+
+          <section class="shopper-card map-card" aria-labelledby="map-title">
+            <div class="panel-heading map-heading">
+              <div>
+                <p class="eyebrow">10 × 10 STORE FLOORPLAN</p>
+                <h2 id="map-title">Your store route</h2>
+              </div>
+              <span class="map-live"><span class="status-dot"></span> LIVE MAP</span>
+            </div>
+            <div class="map-legend" aria-label="Store map legend">
+              <span><i class="legend-swatch legend-walk"></i>Walkway</span>
+              <span><i class="legend-swatch legend-shelf"></i>Shelves</span>
+              <span><i class="legend-swatch legend-entrance"></i>Entrance</span>
+              <span><i class="legend-swatch legend-checkout"></i>Checkout</span>
+              <span><i class="legend-swatch legend-pin"></i>Cart item</span>
+            </div>
+            <div class="store-map-wrap">
+              <svg id="store-map" class="store-map" viewBox="0 0 500 500" role="img" aria-label="10 by 10 supermarket map. Green marks the entrance, red marks checkout, and gold pins mark selected items.">
+                <g id="map-cells"></g>
+                <g id="map-markers"></g>
+                <polyline id="route-line" class="route-line" points="" aria-hidden="true"></polyline>
+                <g id="route-labels"></g>
+              </svg>
+            </div>
+            <div class="route-summary" aria-live="polite">
+              <div><span class="route-summary-label">WALKING DISTANCE</span><strong id="route-steps">—</strong></div>
+              <p id="route-message">Add items to your cart, then find your shortest route.</p>
+            </div>
+            <section class="directions-panel" aria-labelledby="directions-title">
+              <h3 id="directions-title">Walking directions</h3>
+              <ol id="walking-directions" class="walking-directions">
+                <li>Your directions will appear here.</li>
+              </ol>
+            </section>
+          </section>
+        </div>
+      </section>
 
       <footer class="footer">
         <span>© <span id="year"></span> Aislewise</span>
-        <span>Review records are loaded directly from PostgreSQL.</span>
+        <span>Product reviews and shopper feedback are stored in PostgreSQL.</span>
       </footer>
     </main>
+
+    <dialog id="checkout-dialog" class="checkout-dialog" aria-labelledby="checkout-title">
+      <form id="checkout-form" class="checkout-form">
+        <div class="dialog-heading">
+          <div>
+            <p class="eyebrow">TRIP COMPLETE</p>
+            <h2 id="checkout-title">How was your shop?</h2>
+          </div>
+          <button id="close-checkout" class="dialog-close" type="button" aria-label="Close feedback form">×</button>
+        </div>
+        <p class="dialog-copy">Your name and feedback will be visible in Product Intelligence.</p>
+        <label class="form-field">Customer name
+          <input id="customer-name" name="customer_name" type="text" autocomplete="name" maxlength="120" required>
+        </label>
+        <label class="form-field">Your rating
+          <select id="shopper-rating" name="rating" required>
+            <option value="">Choose a rating</option>
+            <option value="5">★★★★★ — Loved it</option>
+            <option value="4">★★★★ — Good</option>
+            <option value="3">★★★ — It was okay</option>
+            <option value="2">★★ — Could be better</option>
+            <option value="1">★ — Disappointing</option>
+          </select>
+        </label>
+        <label class="form-field">Tell us about your experience
+          <textarea id="shopper-review-text" name="review_text" rows="4" maxlength="2000" required></textarea>
+        </label>
+        <input id="review-dwell-time" name="dwell_time_seconds" type="hidden" value="0">
+        <p id="checkout-error" class="checkout-error" role="alert" hidden></p>
+        <div class="dialog-actions">
+          <button class="secondary-button" type="button" id="cancel-checkout">Keep shopping</button>
+          <button id="submit-feedback" class="primary-button" type="submit">Submit feedback</button>
+        </div>
+      </form>
+    </dialog>
   </body>
 </html>

@@ -1,12 +1,15 @@
 import os
 from contextlib import contextmanager
+from functools import lru_cache
 from pathlib import Path
 from urllib.parse import urlsplit
 
 import psycopg2
 from dotenv import load_dotenv
 from flask import Flask, current_app, jsonify, render_template, request
-from psycopg2.extras import RealDictCursor
+from psycopg2.extras import Json, RealDictCursor
+
+from shopper_review_schema import validate_shopper_review_payload
 
 
 BASE_DIR = Path(__file__).resolve().parent
@@ -16,6 +19,10 @@ app = Flask(__name__, template_folder="templates", static_folder="public/static"
 
 
 class DatabaseConfigurationError(RuntimeError):
+    pass
+
+
+class SentimentModelUnavailable(RuntimeError):
     pass
 
 
@@ -60,6 +67,96 @@ def parse_positive_integer(value, name):
     if parsed < 1:
         raise ValueError(f"{name} must be a positive whole number.")
     return parsed
+
+
+@lru_cache(maxsize=1)
+def load_registered_sentiment_model(tracking_uri, model_name):
+    try:
+        import mlflow
+        from mlflow.tracking import MlflowClient
+    except ImportError as error:
+        raise SentimentModelUnavailable(
+            "MLflow and the model's Python dependencies are not installed."
+        ) from error
+
+    mlflow.set_tracking_uri(tracking_uri)
+    client = MlflowClient(tracking_uri=tracking_uri)
+    try:
+        registered_model = client.get_registered_model(model_name)
+    except mlflow.exceptions.MlflowException as error:
+        raise SentimentModelUnavailable(
+            f"The registered sentiment model {model_name!r} could not be found."
+        ) from error
+
+    ready_versions = [
+        version for version in registered_model.latest_versions if version.status == "READY"
+    ]
+    if not ready_versions:
+        raise SentimentModelUnavailable(
+            f"The registered sentiment model {model_name!r} has no ready version."
+        )
+
+    latest_version = max(ready_versions, key=lambda version: int(version.version))
+    try:
+        return mlflow.sklearn.load_model(
+            f"models:/{model_name}/{latest_version.version}"
+        )
+    except (ImportError, OSError, ValueError, mlflow.exceptions.MlflowException) as error:
+        raise SentimentModelUnavailable(
+            f"The registered sentiment model {model_name!r} could not be loaded."
+        ) from error
+
+
+def predict_shopper_sentiment(review_text):
+    tracking_uri = os.getenv("MLFLOW_TRACKING_URI", "").strip()
+    if not tracking_uri:
+        local_registry = BASE_DIR / "mlflow.db"
+        if not local_registry.is_file():
+            raise SentimentModelUnavailable(
+                "Set MLFLOW_TRACKING_URI to a reachable MLflow model registry."
+            )
+        tracking_uri = f"sqlite:///{local_registry.as_posix()}"
+
+    model_name = os.getenv("MLFLOW_MODEL_NAME", "Aislewise_Sentiment_Model").strip()
+    if not model_name:
+        raise SentimentModelUnavailable("MLFLOW_MODEL_NAME must not be empty.")
+
+    model = load_registered_sentiment_model(tracking_uri, model_name)
+    try:
+        prediction = model.predict([review_text])[0]
+    except (ImportError, OSError, TypeError, ValueError) as error:
+        raise SentimentModelUnavailable(
+            "The registered sentiment model could not evaluate this review."
+        ) from error
+
+    label = str(prediction).strip().lower()
+    if label in {"1", "1.0", "true", "positive"}:
+        return "positive"
+    if label in {"0", "0.0", "false", "negative"}:
+        return "negative"
+    raise SentimentModelUnavailable(
+        "The registered sentiment model returned an unsupported sentiment label."
+    )
+
+
+def serialize_shopper_feedback(row):
+    return {
+        "id": row["id"],
+        "customer_name": row["customer_name"],
+        "rating": int(row["rating"]),
+        "review_text": row["review_text"],
+        "sentiment": row["sentiment"],
+        "dwell_time_seconds": float(row["dwell_time_seconds"]),
+        "cart_items": row["cart_items"],
+        "created_at": row["created_at"].isoformat(),
+    }
+
+
+def shopper_feedback_storage_error_response(error):
+    current_app.logger.error("Shopper feedback PostgreSQL request failed (%s)", type(error).__name__)
+    return jsonify(
+        error="Shopper feedback storage is unavailable. Check the PostgreSQL connection and migration."
+    ), 503
 
 
 @app.get("/")
@@ -223,6 +320,106 @@ def reviews():
         total=total,
         total_pages=max(1, (total + page_size - 1) // page_size),
     )
+
+
+@app.get("/api/shopper-reviews")
+def shopper_reviews():
+    try:
+        with database_connection() as connection:
+            with connection.cursor(cursor_factory=RealDictCursor) as cursor:
+                cursor.execute(
+                    """
+                    SELECT
+                        id,
+                        customer_name,
+                        rating,
+                        review_text,
+                        sentiment,
+                        dwell_time_seconds,
+                        cart_items,
+                        created_at
+                    FROM shopper_feedback
+                    ORDER BY created_at DESC, id DESC
+                    LIMIT 20
+                    """
+                )
+                rows = cursor.fetchall()
+                cursor.execute("SELECT COUNT(*) AS total FROM shopper_feedback")
+                total = cursor.fetchone()["total"]
+        return jsonify(
+            reviews=[serialize_shopper_feedback(row) for row in rows],
+            total=total,
+        )
+    except psycopg2.errors.UndefinedTable as error:
+        current_app.logger.error("Shopper feedback migration has not been applied")
+        return jsonify(
+            error="Shopper feedback is not initialized. Apply migrations/001_create_shopper_feedback.sql."
+        ), 503
+    except (DatabaseConfigurationError, psycopg2.Error) as error:
+        return shopper_feedback_storage_error_response(error)
+
+
+@app.post("/api/reviews")
+def submit_shopper_review():
+    if not request.is_json:
+        return jsonify(error="Submit feedback using a JSON request."), 400
+
+    try:
+        review = validate_shopper_review_payload(request.get_json(silent=True))
+    except ValueError as error:
+        return jsonify(error=str(error)), 400
+
+    try:
+        sentiment = predict_shopper_sentiment(review["review_text"])
+    except SentimentModelUnavailable as error:
+        current_app.logger.error("Shopper feedback sentiment inference failed: %s", error)
+        return jsonify(
+            error="The sentiment model is unavailable. Feedback was not saved; try again later."
+        ), 503
+
+    try:
+        with database_connection() as connection:
+            with connection.cursor(cursor_factory=RealDictCursor) as cursor:
+                cursor.execute(
+                    """
+                    INSERT INTO shopper_feedback (
+                        customer_name,
+                        rating,
+                        review_text,
+                        sentiment,
+                        dwell_time_seconds,
+                        cart_items
+                    )
+                    VALUES (%s, %s, %s, %s, %s, %s)
+                    RETURNING
+                        id,
+                        customer_name,
+                        rating,
+                        review_text,
+                        sentiment,
+                        dwell_time_seconds,
+                        cart_items,
+                        created_at
+                    """,
+                    (
+                        review["customer_name"],
+                        review["rating"],
+                        review["review_text"],
+                        sentiment,
+                        review["dwell_time_seconds"],
+                        Json(review["cart_items"]),
+                    ),
+                )
+                saved_review = cursor.fetchone()
+            connection.commit()
+        return jsonify(review=serialize_shopper_feedback(saved_review)), 201
+    except psycopg2.errors.UndefinedTable as error:
+        current_app.logger.error("Shopper feedback migration has not been applied")
+        return jsonify(
+            error="Shopper feedback is not initialized. Apply migrations/001_create_shopper_feedback.sql."
+        ), 503
+    except (DatabaseConfigurationError, psycopg2.Error) as error:
+        return shopper_feedback_storage_error_response(error)
 
 
 if __name__ == "__main__":

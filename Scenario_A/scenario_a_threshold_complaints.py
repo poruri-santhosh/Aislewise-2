@@ -1,36 +1,38 @@
+import sys
+from pathlib import Path
 import duckdb
 import pandas as pd
 import json
 import matplotlib.pyplot as plt
 import seaborn as sns
+import os
 
-DUCKDB_PATH = "warehouse.duckdb"
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(PROJECT_ROOT))
+from Scenario_A.scenario_mlflow import register_ml_reviews
+
+DUCKDB_PATH = PROJECT_ROOT / "warehouse.duckdb"
+OUTPUT_DIR = Path(__file__).resolve().parent
+os.makedirs(OUTPUT_DIR, exist_ok=True)
 
 # Threshold Configuration
 MIN_RATING = 4.0
 MIN_NEG_PCT = 50.0  # 50% kante ekkuva negative reviews unteనే pick chestundi
 MIN_REVIEWS = 3
 
-def classify_complaint_severity(rating, text):
-    text_lower = str(text).lower()
-    critical_words = ["burn", "fire", "danger", "hazard", "melted", "toxic", "died", "ruined", "shock", "waste"]
-    if rating <= 1.0 or any(w in text_lower for w in critical_words):
+def classify_complaint_severity(rating, sentiment):
+    if sentiment == "negative" and rating <= 1.0:
         return "CRITICAL"
     return "HIGH"
 
-def tag_issue_category(text, title=""):
-    full = f"{title} {text}".lower()
-    if any(k in full for k in ["fit", "size", "lid", "small", "big", "dimension"]):
-        return "Size & Fit Defect"
-    elif any(k in full for k in ["broken", "crack", "cheap", "stop", "defect", "fail", "leak"]):
-        return "Product Quality Failure"
-    elif any(k in full for k in ["delay", "ship", "deliver", "courier"]):
-        return "Shipping Damage / Delay"
-    return "General Malfunction"
+def tag_issue_category(sentiment):
+    return "Model-Classified Negative Experience" if sentiment == "negative" else "Other Experience"
 
 def run_threshold_complaint_analysis():
     con = duckdb.connect(DUCKDB_PATH)
     sns.set_theme(style="whitegrid")
+    register_ml_reviews(con)
 
     print("=" * 65)
     print(" SCENARIO A: THRESHOLD FILTER & DIRECT COMPLAINT REPORT ENGINE ")
@@ -46,7 +48,7 @@ def run_threshold_complaint_analysis():
             negative_pct,
             neg_count,
             pos_count
-        FROM gold_product_discrepancy_flags
+        FROM gold_product_discrepancy_flags_ml
         WHERE avg_star_rating >= {MIN_RATING}
           AND negative_pct >= {MIN_NEG_PCT}
           AND total_reviews >= {MIN_REVIEWS}
@@ -56,35 +58,39 @@ def run_threshold_complaint_analysis():
     print(f"\nFiltered Severe Trap Products: {len(df_severe_products)}")
     print(df_severe_products.head(5).to_string(index=False))
 
-    if df_severe_products.empty:
-        print("No products matched the exact threshold.")
-        con.close()
-        return
-
-    product_ids_tuple = tuple(df_severe_products["product_id"].tolist())
-    product_filter_sql = f"('{product_ids_tuple[0]}')" if len(product_ids_tuple) == 1 else str(product_ids_tuple)
-
     # 2. Extract Reviews and Convert to Direct Complaints
-    reviews_query = f"""
+    con.register("severe_scenario_a_products", df_severe_products[["product_id"]])
+    reviews_query = """
         SELECT 
-            product_id,
-            review_id,
-            rating,
-            title,
-            text,
-            verified_purchase,
-            helpful_vote
-        FROM silver_reviews
-        WHERE product_id IN {product_filter_sql}
-          AND sentiment = 'negative'
-        ORDER BY helpful_vote DESC, rating ASC;
+            r.product_id,
+            r.review_id,
+            r.rating,
+            r.title,
+            r.text,
+            r.verified_purchase,
+            r.helpful_vote,
+            r.sentiment,
+            COALESCE(r.ml_confidence, 0.0) AS ml_confidence
+        FROM silver_reviews_ml AS r
+        INNER JOIN severe_scenario_a_products AS p
+            ON r.product_id = p.product_id
+        WHERE r.sentiment = 'negative'
+        ORDER BY r.helpful_vote DESC, r.rating ASC;
     """
-    df_complaints_raw = con.execute(reviews_query).df()
+    if df_severe_products.empty:
+        df_complaints_raw = pd.DataFrame(
+            columns=[
+                "product_id", "review_id", "rating", "title", "text",
+                "verified_purchase", "helpful_vote", "sentiment", "ml_confidence",
+            ]
+        )
+    else:
+        df_complaints_raw = con.execute(reviews_query).df()
 
     complaints_list = []
     for _, row in df_complaints_raw.iterrows():
-        severity = classify_complaint_severity(row["rating"], row["text"])
-        category = tag_issue_category(row["text"], row["title"])
+        severity = classify_complaint_severity(row["rating"], row["sentiment"])
+        category = tag_issue_category(row["sentiment"])
         complaints_list.append({
             "product_id": row["product_id"],
             "review_id": row["review_id"],
@@ -97,13 +103,18 @@ def run_threshold_complaint_analysis():
             "helpful_upvotes": int(row["helpful_vote"]) if pd.notnull(row["helpful_vote"]) else 0
         })
 
-    df_complaints = pd.DataFrame(complaints_list)
+    complaint_columns = [
+        "product_id", "review_id", "assigned_rating", "complaint_severity",
+        "issue_category", "complaint_title", "complaint_statement",
+        "verified_buyer", "helpful_upvotes",
+    ]
+    df_complaints = pd.DataFrame(complaints_list, columns=complaint_columns)
 
     # 3. Save to DuckDB Gold Layer
     con.execute("CREATE OR REPLACE TABLE gold_scenario_a_severe_complaints AS SELECT * FROM df_complaints;")
 
     # 4. Save Human-Readable Text Report
-    report_file_txt = "scenario_a_complaints_report.txt"
+    report_file_txt = OUTPUT_DIR / "scenario_a_complaints_report.txt"
     with open(report_file_txt, "w", encoding="utf-8") as f:
         f.write("====================================================================\n")
         f.write("       AISLEWISE FORENSIC REPORT: SEVERE SCENARIO A COMPLAINTS       \n")
@@ -128,7 +139,7 @@ def run_threshold_complaint_analysis():
             f.write("-" * 68 + "\n\n")
 
     # 5. Save Structured JSON Report
-    report_file_json = "scenario_a_complaints_report.json"
+    report_file_json = OUTPUT_DIR / "scenario_a_complaints_report.json"
     with open(report_file_json, "w", encoding="utf-8") as jf:
         json.dump(complaints_list, jf, indent=2)
 
@@ -169,15 +180,16 @@ def run_threshold_complaint_analysis():
     takeaway = (
         "ARTHAM (Takeaway):\n"
         f"• Threshold filter dwara Display Rating >= {MIN_RATING} unna kooda 50%+ negative reviews unna extreme products ni filter chesam.\n"
-        "• Reviews direct complaints ga convert cheyabaddayi, andulo majority issues 'Product Quality' mariyu 'Size & Fit' lone unnayi.\n"
+        "• MLflow negative sentiment tho classify ayina reviews direct complaints ga convert cheyabaddayi.\n"
         "• Ee data file ('scenario_a_complaints_report.txt') vendor audit and quality assurance team ki direct action report ga panikosthundi."
     )
     plt.figtext(0.5, -0.15, takeaway, wrap=True, horizontalalignment='center',
                 fontsize=11, bbox=dict(boxstyle='round,pad=0.6', facecolor='#f8f9fa', edgecolor='#bdc3c7'))
 
     plt.tight_layout()
-    plt.savefig("chart_scenario_a_complaints.png", dpi=300, bbox_inches='tight')
-    print("Saved Chart: chart_scenario_a_complaints.png")
+    chart_path = OUTPUT_DIR / "chart_scenario_a_complaints.png"
+    plt.savefig(chart_path, dpi=300, bbox_inches='tight')
+    print(f"Saved Chart: {chart_path}")
 
     con.close()
     print("=" * 65)

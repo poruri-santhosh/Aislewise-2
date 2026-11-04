@@ -37,14 +37,16 @@ The applications share the project’s review domain, but they do **not** share 
 
 ### Streamlit analytics dashboard
 
-- Show review/product totals and counts for the three product-quality scenarios.
+- Score warehouse reviews with the registered MLflow sentiment model and report processed-review totals, flagged-trap ratio, and average confidence.
+- Filter results by minimum model confidence, price tier, and product category.
 - Investigate **Scenario A: Rating traps**—high average star rating with a large share of negative review labels.
 - Investigate **Scenario B: Hidden gems**—low average star rating with a large share of positive review labels.
 - Investigate **Scenario C: Catalog lemons**—low average rating with a high share of negative review labels.
+- View the existing scenario charts and the interactive vendor-notice index.
 - Inspect a product’s classification and customer reviews by product ID.
 - Download the Scenario C results as a CSV.
 
-The dashboard reads DuckDB tables in read-only mode. Its optional 10-second rerun and manual refresh controls only re-read the current local snapshot.
+The dashboard reads DuckDB in read-only mode and scores reviews on demand with the registered model. Its optional 10-second rerun and manual refresh controls re-read the current local snapshot.
 
 ## System architecture
 
@@ -75,7 +77,7 @@ flowchart LR
 
 | Path | Runtime behavior | Deployment |
 |---|---|---|
-| Website | Each request reaches Flask, which queries PostgreSQL and returns HTML or JSON. | Vercel Python function at `api/index.py`; configure `DATABASE_URL` in Vercel. |
+| Website | Flask serves the product review catalogue and shopper feedback API; browser-only JavaScript plans in-store routes. | Vercel Python function from root `app.py`; configure PostgreSQL and MLflow. |
 | Dashboard | Streamlit reads the checked-in `warehouse.duckdb` file. No PostgreSQL connection is required to view that snapshot. | Streamlit Community Cloud; app file `streamlit/app.py`. |
 
 `DATABASE_URL` is used by the website. `NEON_DATABASE_URL` is used by the PostgreSQL loader/sync and optional Bronze ingestion scripts. These are configuration names, not values to put in source control.
@@ -106,7 +108,7 @@ flowchart TD
 1. **Generate sample inputs (optional).** `dataset_generation.py` streams the Appliances category review and metadata files from the UCSD Amazon Reviews 2023 dataset. It selects up to 50,000 reviews with text, finds matching products, and writes PostgreSQL CSVs and MongoDB JSONL files.
 2. **Load PostgreSQL (optional).** `load_to_postgres.py` creates the `products` and `reviews` tables and loads products before reviews. Review product IDs reference product rows. Do not assume rerunning the import is an upsert or reset operation.
 3. **Load MongoDB (optional).** `load_to_mongodb.py` loads product details and raw reviews. **Warning:** it drops its destination collections before loading; only use it with a disposable database or after backing up data.
-4. **Sync analytics reviews.** `incremental_sync.py` polls PostgreSQL in batches, uses a timestamp checkpoint, assigns each review a simple rule-based sentiment, inserts it into `silver_reviews`, and refreshes the product discrepancy aggregates and Scenario A/B flags in `warehouse.duckdb`.
+4. **Sync analytics reviews.** `incremental_sync.py` polls PostgreSQL in batches and uses a timestamp checkpoint to insert new reviews into `silver_reviews`. Scenario analysis and the Streamlit dashboard use the registered MLflow sentiment model to score review text and calculate confidence.
 5. **Run analysis and inspect results.** Scenario scripts and analysis/export scripts use the DuckDB warehouse to produce additional scenario tables, investigations, and outputs. The Streamlit dashboard queries the prepared tables.
 6. **Optional Bronze copy.** `ingest_to_duckdb.py` copies raw PostgreSQL products/reviews and MongoDB product details into `aislewise_warehouse.duckdb`. This is a separate Bronze-ingestion database, not the dashboard warehouse, and it does not build the dashboard’s Silver/Gold tables.
 
@@ -128,22 +130,22 @@ The current rule thresholds are:
 | **B — Hidden gems** | Average product rating ≤ 3.0 and positive review share ≥ 65%. |
 | **C — Catalog lemons** | Average product rating ≤ 2.5 and negative review share ≥ 60%. |
 
-`incremental_sync.py` uses a small positive/negative keyword list together with star ratings to classify sentiment as positive, negative, or neutral. It is a lightweight heuristic—not a trained language model, aspect-based analysis, or a verified judgment of customer intent. Sarcasm, context, mixed feedback, and words used in different senses can produce incorrect labels. Review the underlying text before making a business decision.
+`incremental_sync.py` currently stores its legacy sentiment label in `silver_reviews`. The scenario scripts and dashboard independently use `Aislewise_Sentiment_Model` and its prediction confidence for their ML-scored results. Model output remains an investigative signal—not a verified judgment of customer intent—so review the underlying text before making a business decision.
 
 ## Repository map
 
 ```text
 Aislewise/
 ├── app.py                       # Flask website, PostgreSQL connection, and JSON API
-├── api/
-│   └── index.py                 # Vercel Flask entry point
+├── shopper_review_schema.py     # Pandera contract for shopper feedback
+├── migrations/
+│   └── 001_create_shopper_feedback.sql
 ├── templates/
 │   └── index.html               # Website HTML
-├── static/
-│   ├── css/
-│   │   └── styles.css           # Website layout and responsive styles
-│   └── js/
-│       └── reviews.js           # Browser search, filters, and pagination
+├── public/
+│   └── static/
+│       ├── css/styles.css       # Responsive product and shopper styles
+│       └── js/reviews.js        # Catalogue, cart, SVG map, and A* routing
 ├── streamlit/
 │   ├── app.py                   # Streamlit review-analysis dashboard
 │   └── requirements.txt         # Dashboard dependencies
@@ -155,6 +157,9 @@ Aislewise/
 ├── Scenario_A/                  # Rating-trap investigations and supplier notices
 ├── Scenario_B/                  # Hidden-gem investigations
 ├── Scenario_C/                  # Poor-rating product audits
+├── scripts/                     # Root-level investigation scripts
+├── reports/                     # Generated root-level reports
+├── visuals/                     # Generated root-level charts
 ├── warehouse.duckdb             # Dashboard's 50,000-review analytics snapshot
 ├── aislewise_warehouse.duckdb   # Local Bronze-ingestion database, if generated
 ├── dataset_generation.py        # Fetch reviews and matching product metadata
@@ -163,12 +168,12 @@ Aislewise/
 ├── ingest_to_duckdb.py          # Copy PostgreSQL/MongoDB data to Bronze tables
 ├── incremental_sync.py          # Sync PostgreSQL reviews to DuckDB and classify
 ├── run_analysis.py              # Portfolio summaries and overview chart
-├── deep_investigation_suite.py   # Root-cause and verification analyses
 ├── export_analysis.py           # Export selected summaries to CSV and JSON
-├── requirements.txt             # Flask/Vercel dependencies
+├── organize_project.py          # Preview/apply root-level file organization
+├── requirements.txt             # Flask, Pandera, MLflow, and model dependencies
 ├── requirements-analysis.txt    # Data and analysis dependencies
 ├── requirements-dev.txt         # Test dependencies
-├── vercel.json                  # Vercel routing and Python function setup
+├── vercel.json                  # Vercel Flask function settings
 └── README.md
 ```
 
@@ -254,6 +259,16 @@ python -m streamlit run streamlit/app.py
 
 The dashboard opens in your browser and reads `warehouse.duckdb`. It does not need PostgreSQL to display the checked-in snapshot.
 
+### Run the analytics dashboard with Docker
+
+The Compose service runs the Streamlit entry point at `streamlit/app.py`. It mounts the local DuckDB warehouse, MLflow registry database/artifacts, and scenario folders into the container. Keep those data and model files available alongside `docker-compose.yml`.
+
+```powershell
+docker compose up --build
+```
+
+Open <http://localhost:8501>. To stop the service, run `docker compose down`. The Docker image excludes private environment files and local database/model artifacts; Compose supplies the warehouse and model mounts at runtime.
+
 ## Optional: create or refresh the data
 
 Run data-loading steps only when you intend to create or change data. They are not required to run the website against an existing PostgreSQL database or view the existing dashboard snapshot.
@@ -279,7 +294,7 @@ python incremental_sync.py
 
 ```bash
 python run_analysis.py
-python deep_investigation_suite.py
+python scripts/deep_investigation_suite.py
 python Scenario_A/scenario_a_trap_products.py
 python Scenario_B/scenario_b_base_detection.py
 python Scenario_B/scenario_b_deep_forensics.py
@@ -294,6 +309,14 @@ Scripts can update DuckDB tables and create reports/charts/exports. Check each s
 ### Flask website on Vercel
 
 Vercel serves the Flask website/API only; it does not host the Streamlit dashboard or read the local DuckDB snapshot for website requests.
+
+The website includes two client-side modes. **Product Intelligence** keeps the PostgreSQL product-review catalogue and displays recent shopper feedback with its MLflow sentiment badge. **Shopper Navigation** uses a vanilla JavaScript cart, an SVG floorplan, A* routing, and a nearest-neighbor multi-stop heuristic. It does not need React, npm, or a frontend build step.
+
+Shopper feedback is stored separately from product reviews because it rates the in-store trip rather than an individual product. Before accepting feedback, create the `shopper_feedback` table by running `migrations/001_create_shopper_feedback.sql` in the PostgreSQL database. The application database role needs `SELECT` and `INSERT` access to that table. The submission API validates non-empty customer name and review text, integer rating 1–5, and non-negative dwell time with Pandera before running model inference or inserting a row.
+
+The submission endpoint loads the latest ready version of the registered `Aislewise_Sentiment_Model`. For local development, the app uses the project's `mlflow.db` when it exists. For a deployed app, configure `MLFLOW_TRACKING_URI` to a reachable MLflow registry with its model artifacts available, and optionally set `MLFLOW_MODEL_NAME`. The local `mlflow.db` and `mlruns/` artifacts are excluded from Git and Vercel uploads; they are not a production model registry. If PostgreSQL migration or MLflow configuration is missing, the feedback form shows an explicit error and does not report a successful save.
+
+**Privacy:** submitted customer names and feedback text are visible in Product Intelligence. Make sure users are informed before they submit, and confirm the PostgreSQL, model-registry, and dataset access policies before publishing the site.
 
 ### 1. Push the project to GitHub
 
@@ -320,7 +343,7 @@ Before pushing, make sure `.env`, `.streamlit/secrets.toml`, `.vercel/`, `aislew
 5. Use the SSL-enabled PostgreSQL URL. Do not add a connection URL to `vercel.json` or commit it to GitHub.
 6. Deploy the project.
 
-`vercel.json` points Vercel to `api/index.py`. The Python function loads `app.py` and uses the included HTML template, CSS, and JavaScript files.
+Vercel detects the root `app.py` as the Flask app. Templates are included in the serverless function and assets under `public/` are served statically. Add both `DATABASE_URL` and `MLFLOW_TRACKING_URI` in Vercel project settings. The PostgreSQL migration must be applied before shopper feedback can be listed or submitted; the configured MLflow registry must contain a ready version of the sentiment model.
 
 ### 3. Verify the Vercel deployment
 
@@ -349,7 +372,7 @@ python -m pip install -r requirements-dev.txt -r streamlit/requirements.txt
 python -m pytest -q
 ```
 
-Tests cover the website, static assets, API behavior and filtering/pagination, invalid input and missing database configuration, and dashboard startup. Live PostgreSQL checks are skipped when the relevant database URL is not configured. Do not add production database credentials to CI unless you intentionally want tests to access that database.
+Tests cover the website, static assets, API behavior and filtering/pagination, Pandera validation and shopper submission behavior, invalid input and missing database configuration, and dashboard startup. Live PostgreSQL checks are skipped when the relevant database URL is not configured. Do not add production database credentials to CI unless you intentionally want tests to access that database.
 
 ## Operational notes and limitations
 
