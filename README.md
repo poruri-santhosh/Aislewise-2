@@ -1,4 +1,6 @@
-# Aislewise: Dual-Domain In-Store Navigation & Review Intelligence
+# Aislewise — Retail Product Intelligence & Analytics Platform
+
+**Bridging Dynamic In-Store Navigation with Automated Review Forensics**
 
 [![Vercel Deployment](https://img.shields.io/badge/Vercel-Storefront%20Live-black?style=for-the-badge&logo=vercel)](https://productreviewintelligence.vercel.app)
 [![Streamlit Cloud](https://img.shields.io/badge/Streamlit-Analytics%20Dashboard-FF4B4B?style=for-the-badge&logo=streamlit)](https://aislewise-2-4iv34qn38dgv3q7npfggyv.streamlit.app/)
@@ -6,47 +8,76 @@
 [![Database](https://img.shields.io/badge/PostgreSQL-Neon%20Serverless-4169E1?style=for-the-badge&logo=postgresql&logoColor=white)](https://neon.tech/)
 [![OLAP Warehouse](https://img.shields.io/badge/DuckDB-In--Process%20OLAP-FFF000?style=for-the-badge&logo=duckdb&logoColor=black)](https://duckdb.org/)
 [![ML Framework](https://img.shields.io/badge/scikit--learn-NLP%20Pipeline-F7931E?style=for-the-badge&logo=scikit-learn&logoColor=white)](https://scikit-learn.org/)
-[![License](https://img.shields.io/badge/License-Apache%202.0-green)](LICENSE)
-
-Aislewise is a full-stack, dual-domain retail engineering platform demonstrating decoupled transactional (OLTP) and analytical (OLAP) workflows. The project pairs an in-browser grocery routing storefront with an offline forensic review intelligence engine evaluated against the UCSD Amazon Reviews 2023 dataset.
 
 ---
 
-## 1. Executive Overview & Domain Separation
+## 1. Executive Summary & Problem Statement
 
-Aislewise explicitly isolates transactional operations from analytical investigations across two distinct functional domains:
+Retail platforms face two distinct operational challenges across physical and digital customer touchpoints:
 
-* **Module 1 — In-Store Grocery Navigation & Shopper Telemetry (OLTP):**
-  * A client-side, zero-build web interface (HTML5, CSS3, Vanilla JavaScript, inline SVG).
-  * Implements dynamic A* pathfinding and nearest-neighbor multi-stop wayfinding across a grocery aisle grid.
-  * Ingests shopper checkout telemetry, dwell times, and in-store feedback into a Neon PostgreSQL database validated via Pandera runtime schemas.
-* **Module 2 — Product Review Intelligence & Forensic Auditing (OLAP):**
-  * Ingests, cleanses, and structures UCSD Amazon Reviews 2023 (Appliances category) data across Bronze, Silver, and Gold relational tables in DuckDB.
-  * Implements forensic detection algorithms across three investigative scenarios (rating-sentiment discrepancy, rating recovery arithmetic, and NLP semantic audit).
-  * Exposes interactive data exploration and model diagnostics through an executive Streamlit dashboard.
+1. **Rating–Sentiment Divergence (Catalog Blindspots):** High average star ratings frequently obscure localized product defects, low sample sizes, or severe text-based complaints. Retailers lack automated mechanisms to triage deceptive products before customer trust degrades.
+2. **In-Store Wayfinding Friction:** Physical supermarket shopping involves fragmented path planning and poor telemetry collection during checkout.
 
-> **Operational Boundary:** The Amazon Appliances review corpus and the in-store grocery catalog operate on independent schemas and data lifecycles. Amazon Appliances records do not populate the physical grocery storefront shelves, and submitted shopper feedback is not automatically replicated into DuckDB analytics without explicitly launching the manual polling synchronization worker.
+### The Aislewise Solution
+Aislewise decouples operational transactional workflows from offline analytical investigations into two independent functional domains:
+
+* **In-Store Grocery Navigation (OLTP):** A client-side, zero-build SVG storefront delivering browser-based A* pathfinding and greedy nearest-neighbor stop sequencing, streaming validated telemetry into a serverless PostgreSQL store.
+* **Product Review Forensics (OLAP):** An analytical engine evaluating 50,000 Amazon Appliances reviews across a DuckDB Medallion warehouse, segmenting products into three actionable discrepancy scenarios (Rating Traps, Hidden Gems, Catalog Lemons) using calibrated NLP sentiment inference.
 
 ---
 
 ## 2. Live Deployments
 
-| Component | Platform | Live URL |
-| :--- | :--- | :--- |
-| **Storefront & Navigation** | Vercel Serverless | [https://productreviewintelligence.vercel.app](https://productreviewintelligence.vercel.app) |
-| **Executive BI Dashboard** | Streamlit Community Cloud | [https://aislewise-2-4iv34qn38dgv3q7npfggyv.streamlit.app/](https://aislewise-2-4iv34qn38dgv3q7npfggyv.streamlit.app/) |
-| **Source Code Repository** | GitHub | [https://github.com/poruri-santhosh/Aislewise-2](https://github.com/poruri-santhosh/Aislewise-2) |
+| Component | Platform | Deployment URL | Role |
+| :--- | :--- | :--- | :--- |
+| **Live Storefront & Navigation** | Vercel Serverless | [productreviewintelligence.vercel.app](https://productreviewintelligence.vercel.app) | Interactive client grocery map, A* routing, cart telemetry |
+| **Executive BI Analytics Suite** | Streamlit Community Cloud | [aislewise-2.streamlit.app](https://aislewise-2-4iv34qn38dgv3q7npfggyv.streamlit.app/) | Scenario drill-downs, distributions, and review auditing |
+| **Source Code Repository** | GitHub | [Aislewise-2 Repository](https://github.com/poruri-santhosh/Aislewise-2) | Full source code, migrations, schemas, and pipelines |
+
+> **Domain & Data Lifecycle Boundary:**  
+> The **Storefront** simulates an in-store grocery environment running client-side A* pathfinding.  
+> The **Analytics Dashboard** performs forensic evaluations over the **UCSD Amazon Reviews 2023 (Appliances category)** dataset.  
+> These domains operate on independent data lifecycles. Amazon Appliances records do not populate the grocery storefront shelves, and submitted shopper feedback is not automatically replicated into DuckDB analytics without explicitly launching the incremental synchronization worker.
 
 ---
 
-## 3. High-Level System Architecture
+## 3. Key Business Findings & Forensic Scenarios
+
+Analysis conducted over **50,000 ingested reviews** covering **15,641 unique parent ASINs** in the Amazon Appliances corpus:
+
+| Scenario / Cohort | Selection Criteria | Product Count | Catalog Share | Business Interpretation & Recommended Remediation |
+| :--- | :--- | :---: | :---: | :--- |
+| **Scenario A: Rating Traps** | $\text{Stars} \ge 4.0 \;\land\; \text{NegShare} \ge 35\%$ | **440** | 2.81% | High aggregate star ratings masking severe customer complaints. *Action:* Trigger manual engineering & catalog audit. |
+| **Scenario B: Hidden Gems** | $\text{Stars} \le 3.0 \;\land\; \text{PosShare} \ge 65\%$ | **174** | 1.11% | High-sentiment products suppressed by low sample sizes. *Action:* Solicit honest customer feedback coverage. |
+| **Scenario C: Catalog Lemons** | $\text{Stars} \le 2.5 \;\land\; \text{NegShare} \ge 60\%$ | **1,481** | 9.47% | Chronic low quality with high negative alignment. *Action:* Prioritize for quality remediation or catalog de-listing. |
+| **Nominal Catalog** | Balanced Rating & Sentiment | **13,546** | 86.61% | Standard commercial performance aligned with consumer expectations. |
+
+### 3.1 Scenario A — Defect Complaint Taxonomy
+An audited sample of **497 negative reviews** from **694 verified purchase customer records** highlights recurring defect signals:
+* **Core Product Defect Reports:** 243 reviews (48.89%)
+* **Size & Fitment Complaints:** 117 reviews (23.54%)
+* **Material & Build Quality:** 103 reviews (20.72%)
+* **Carrier & Packaging Logistics:** 34 reviews (6.84%)  
+*(Note: Taxonomy categories are non-exclusive; individual reviews can match multiple keyword regex patterns. Figures reflect customer-reported defect signals rather than certified engineering failure audits).*
+
+### 3.2 Scenario B — Target Rating Recovery Mathematics
+Scenario B computes the deterministic minimum integer count of consecutive 5-star reviews ($\Delta R_5$) required to elevate an underperforming product's average rating to target threshold $T$ ($T < 5.0$):
+
+$$\Delta R_5 = \max\left(0, \; \left\lceil \frac{T \cdot N - \sum_{i=1}^N r_i}{5 - T} \right\rceil\right)$$
+
+* **Target Boundary Condition ($T = 5.0$):** At $T = 5.0$, the denominator evaluates to zero ($5 - 5 = 0$). An existing product with any review $r_i < 5$ cannot reach an exact average of $5.0$ through finite reviews ($\lim_{T \to 5^-} \Delta R_5 = \infty$).
+* **Methodology Note:** This represents **deterministic arithmetic recovery** assuming every single additional review is strictly 5 stars. It is not probabilistic Bayesian updating, nor is it a recommendation to solicit biased reviews.
+
+---
+
+## 4. High-Level System Architecture
 
 ```mermaid
 flowchart TD
-    subgraph M1_Client ["Module 1: Client Browser"]
+    subgraph M1_Client ["Module 1: Client Storefront Layer"]
         UI["Storefront UI & Cart\n(HTML5 / CSS3 / Vanilla JS)"]
-        SVGMap["Interactive SVG Grid Map"]
-        AStarEngine["Client-Side A* Pathfinding\n+ Nearest-Neighbor Stop Ordering"]
+        SVGMap["Interactive SVG Floor Grid"]
+        AStarEngine["Client-Side A* Pathfinding\n+ Greedy Nearest-Neighbor Sequencing"]
         UI --> SVGMap
         SVGMap --> AStarEngine
     end
@@ -54,27 +85,27 @@ flowchart TD
     subgraph M1_OLTP ["Module 1: Transactional Layer (Vercel Serverless)"]
         FlaskAPI["Flask REST API\n(app.py)"]
         PanderaValidator["Pandera DataFrame Validation\n(shopper_review_schema.py)"]
-        LocalJoblib["Joblib Serialized Pipeline\n(models/sentiment_pipeline.pkl)"]
-        RegistryFallback["MLflow Registry Fallback\n(Lazy import if artifact absent)"]
+        LocalJoblib["Joblib Scikit-Learn Pipeline\n(models/sentiment_pipeline.pkl)"]
+        RegistryFallback["MLflow Registry Fallback\n(Lazy import if artifact missing)"]
 
         UI -->|"POST /api/shopper-reviews"| FlaskAPI
         FlaskAPI --> PanderaValidator
         PanderaValidator --> LocalJoblib
-        LocalJoblib -.->|"Missing Artifact Fallback"| RegistryFallback
+        LocalJoblib -.->|"Fallback if missing"| RegistryFallback
     end
 
     subgraph M1_Storage ["Module 1: Transactional Store"]
-        NeonPG[("Neon Serverless PostgreSQL\n(Tables: products, reviews, shopper_feedback)")]
+        NeonPG[("Neon Serverless PostgreSQL\n(products, reviews, shopper_feedback)")]
         FlaskAPI -->|"INSERT / SELECT (psycopg2)"| NeonPG
     end
 
-    subgraph Sync_Worker ["Data Synchronization Layer"]
-        Worker["incremental_sync.py\n(Manually Launched Polling Worker\n10s Sleep Loop / Watermark Check / INSERT OR IGNORE)"]
-        NeonPG -.->|"SELECT WHERE updated_at > watermark"| Worker
+    subgraph Sync_Worker ["Data Synchronization Worker"]
+        Worker["incremental_sync.py\n(Continuously Polling Worker\n10s Sleep Loop / Watermark Query / INSERT OR IGNORE)"]
+        NeonPG -.->|"Extract records past watermark"| Worker
     end
 
     subgraph M2_OLAP ["Module 2: Analytical Data Warehouse"]
-        DuckDB[("warehouse.duckdb\n(Embedded Columnar OLAP)\nBronze / Silver / Gold Scenarios")]
+        DuckDB[("warehouse.duckdb\n(Embedded Columnar OLAP)\nBronze / Silver / Gold Layers")]
         Worker -.->|"Batched Appends"| DuckDB
     end
 
@@ -90,7 +121,7 @@ flowchart TD
 
 ---
 
-## 4. Technology Stack
+## 5. Technology Stack
 
 | Layer | Technologies | Implementation Role |
 | :--- | :--- | :--- |
@@ -106,17 +137,10 @@ flowchart TD
 
 ---
 
-## 5. Dataset Provenance & Data Engineering Lifecycle
+## 6. Deep Technical Specifications
 
-### Dataset Specifications
-* **Source:** UCSD Amazon Reviews 2023 (Julian McAuley Lab).
-* **Category:** Appliances (`Appliances.jsonl.gz`) matched with metadata (`meta_Appliances.jsonl.gz`).
-* **Ingestion Strategy:** Streamed HTTP extraction via `urllib.request` and `gzip.GzipFile` line-by-line parsing to eliminate memory spikes.
-* **Volume:** Ingestion of up to 50,000 review records and matching parent ASIN metadata.
-* **Cleaning & Type Conversion (`dataset_generation.py`):**
-  * Type-casting and fallback handling via `safe_float()` and `safe_int()`.
-  * Generates sequential review identifiers (`rev_1`, `rev_2`, ...) while preserving user text, verified purchase flags, and timestamps.
-  * Discards records with missing parent ASIN keys.
+<details>
+<summary><strong>🔍 Click to expand: Data Engineering Lifecycle & Medallion Storage</strong></summary>
 
 ### Medallion Layering in DuckDB
 ```mermaid
@@ -150,16 +174,14 @@ flowchart LR
 
 ### Incremental Synchronization Architecture (`incremental_sync.py`)
 Synchronization between Neon PostgreSQL and DuckDB is implemented as a **manually launched, continuously polling worker**:
-* **Polling Loop:** Executes an explicit `while True` loop with a 10-second sleep (`time.sleep(10)`) when no new rows are returned.
-* **Watermark Extraction:** Queries PostgreSQL incrementally using updated timestamps (`WHERE updated_at > %s ORDER BY updated_at ASC LIMIT %s`).
-* **DuckDB Deduplication:** Applies `INSERT OR IGNORE INTO <table_name> VALUES (...)` against unique constraints.
-* **Operational Scope:** Runs on-demand; it is not an automated continuous CDC engine or background cron scheduler.
+* **Polling Architecture:** Runs an explicit `while True` loop with a 10-second sleep (`time.sleep(10)`) when no new records are discovered.
+* **Watermark Extraction:** Queries PostgreSQL using an updated timestamp watermark (`WHERE updated_at > %s ORDER BY updated_at ASC LIMIT %s`).
+* **DuckDB Deduplication:** Executes batch appends utilizing `INSERT OR IGNORE INTO <table_name> VALUES (...)` against unique constraints.
+* **Operational Scope:** On-demand synchronization; not an automated CDC pipeline or scheduled cron daemon.
+</details>
 
----
-
-## 6. Machine Learning Lifecycle: Sentiment Classification
-
-The sentiment classification pipeline scores review polarity and estimates calibrated confidence.
+<details>
+<summary><strong>🤖 Click to expand: Machine Learning Lifecycle & Inference Guardrails</strong></summary>
 
 ```mermaid
 flowchart TD
@@ -196,47 +218,14 @@ flowchart TD
     end
 ```
 
-### Classification Details
-1. **Model Architecture:** Calibrated binary classifier (Positive vs. Negative) using TF-IDF n-grams and Logistic Regression.
-2. **Neutral Classification:** `Neutral` is assigned when prediction probabilities fall within operational uncertainty bands or via heuristic fallbacks on 3-star ratings.
-3. **Inference Fallback:** If incoming review text lacks vocabulary features or is empty, the service applies a star-rating fallback heuristic ($Rating \le 2 \implies Negative$; $Rating \ge 4 \implies Positive$; $Rating = 3 \implies Neutral$).
-4. **Vercel Decoupling:** In production, `sentiment_service.py` deserializes the pre-packaged `models/sentiment_pipeline.pkl` via `joblib`. MLflow is only lazily loaded if the local artifact is missing, ensuring the deployment bundle remains under Vercel's 500 MB serverless limit.
+* **Vercel Decoupling:** In production, `sentiment_service.py` deserializes the pre-packaged `models/sentiment_pipeline.pkl` via `joblib`. MLflow is only loaded on a dynamic fallback branch if the local artifact is missing, ensuring the deployment bundle remains under Vercel's 500 MB limit.
+* **Heuristic Fallback:** When review text lacks vocabulary features or contains non-standard text, the service applies an empirical rating boundary heuristic ($Rating \le 2 \implies Negative$; $Rating \ge 4 \implies Positive$; $Rating = 3 \implies Neutral$).
+</details>
 
----
+<details>
+<summary><strong>🧭 Click to expand: In-Store Navigation & Heuristics</strong></summary>
 
-## 7. Analytical Scenario Findings (Amazon Appliances Corpus)
-
-### Scenario A — Rating Traps (High-Discrepancy Candidates)
-Identifies products where high star ratings contrast with customer-reported negative sentiment.
-* **Selection Threshold:** 
-  $$\text{Rating} \ge 4.0 \quad \land \quad \text{NegativeSentimentShare} \ge 35\%$$
-* **Audited Cohort Scope:** Evaluated across a sample cohort of **497 negative reviews** from **694 verified purchase customer records**.
-* **Classification Taxonomy:** Complaints are tagged into operational categories via keyword boundary regex checks:
-  * `Core Functionality` (243 reviews, 48.89%)
-  * `Fitment & Compatibility` (117 reviews, 23.54%)
-  * `Material & Build Quality` (103 reviews, 20.72%)
-  * `Packaging & Logistics` (34 reviews, 6.84%)
-* **Interpretation:** Categories are non-exclusive; reviews may match multiple tags. These classifications represent **Customer-Reported Defect Signals**, not verified manufacturing defects.
-
-### Scenario B — Arithmetic Rating Recovery Mathematics
-Scenario B computes the structural review volume required to lift an underperforming product's average rating to an acceptable benchmark ($T$).
-
-#### Mathematical Formulation
-For a product with $N$ recorded ratings $r_1, r_2, \dots, r_N$ and current average rating $\bar{R} < T$, the minimum integer count of consecutive 5-star reviews ($\Delta R_5$) required to reach target average $T$ ($T < 5.0$) is:
-
-$$\Delta R_5 = \max\left(0, \; \left\lceil \frac{T \cdot N - \sum_{i=1}^N r_i}{5 - T} \right\rceil\right)$$
-
-* **Target Boundary Condition ($T = 5.0$):** If $T = 5.0$, the denominator evaluates to zero ($5 - 5 = 0$). An existing product with any review $r_i < 5$ cannot reach an exact average of $5.0$ through finite reviews ($\lim_{T \to 5^-} \Delta R_5 = \infty$).
-* **Statistical Note:** This calculation is purely **deterministic recovery arithmetic**; it is not a Bayesian prior-posterior model.
-
-### Scenario C — Semantic Polarity Auditing & Risk Mitigation
-* Evaluates cross-entropy discrepancies between star ratings and text-derived model sentiment.
-* Identifies products with systematic divergence (e.g., severe 1-star clusters with positive text, or low ratings with verified complaints).
-* **Operational Action:** Flags trigger **Recommended Manual Catalog Review** and **Supplier Audit Recommendations**; the system does not execute automated catalog deactivation or external API suppression.
-
----
-
-## 8. In-Store Shopper Navigation & Pathfinding
+The storefront provides an interactive coordinate map rendered via client-side SVG.
 
 ```mermaid
 sequenceDiagram
@@ -263,114 +252,57 @@ sequenceDiagram
 ```
 
 ### Heuristic Specifications
-1. **A\* Grid Search:** The retail floor is represented as a traversable 2D coordinate graph with obstacles corresponding to fixtures and walls. A* computes paths using the Euclidean distance heuristic:
+1. **A\* Grid Traversal:** Traverses a 2D coordinate graph with obstacles corresponding to store shelves and checkout counters using Euclidean distance:
    $$h(n) = \sqrt{(x_n - x_{\text{goal}})^2 + (y_n - y_{\text{goal}})^2}$$
-2. **Nearest-Neighbor Sequencing:** Multi-item cart stops are ordered using a greedy nearest-neighbor heuristic to sequence waypoints prior to computing intermediate A* paths.
+2. **Nearest-Neighbor Sequencing:** Multi-item cart stops are ordered using a greedy nearest-neighbor heuristic to sequence waypoints. *Clarification: This is a fast polynomial-time heuristic designed for low-latency client execution, not a globally optimal Traveling Salesperson Problem (TSP) solver.*
+</details>
 
 ---
 
-## 9. Database Schemas (Neon PostgreSQL)
-
-Managed via `migrations/001_create_shopper_feedback.sql`.
-
-```sql
--- Product Registry
-CREATE TABLE IF NOT EXISTS products (
-    product_id VARCHAR(64) PRIMARY KEY,
-    title TEXT NOT NULL,
-    category VARCHAR(64),
-    price NUMERIC(10, 2) DEFAULT 0.00,
-    aisle_location VARCHAR(32),
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
-);
-
--- Ingested Review Repository
-CREATE TABLE IF NOT EXISTS reviews (
-    review_id VARCHAR(64) PRIMARY KEY,
-    product_id VARCHAR(64) REFERENCES products(product_id),
-    rating INTEGER CHECK (rating BETWEEN 1 AND 5),
-    review_text TEXT,
-    verified_purchase BOOLEAN DEFAULT FALSE,
-    helpful_votes INTEGER DEFAULT 0,
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
-);
-
--- Shopper In-Store Telemetry and Feedback
-CREATE TABLE IF NOT EXISTS shopper_feedback (
-    feedback_id SERIAL PRIMARY KEY,
-    customer_name VARCHAR(128) NOT NULL,
-    rating INTEGER CHECK (rating BETWEEN 1 AND 5),
-    review_text TEXT NOT NULL,
-    dwell_time_seconds NUMERIC(8, 2) CHECK (dwell_time_seconds >= 0.0),
-    cart_items JSONB DEFAULT '[]'::jsonb,
-    predicted_sentiment VARCHAR(32),
-    sentiment_score NUMERIC(5, 4),
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
-);
-```
-
----
-
-## 10. Local Installation & Setup
+## 7. Local Installation & Development Setup
 
 ### Prerequisites
-* Python 3.12+
-* Active PostgreSQL instance (Local or Neon Serverless)
+* Python 3.12 or newer
+* Accessible PostgreSQL instance (Local or Neon Serverless)
 * Git
 
-### 1. Repository Setup & Virtual Environment
 ```bash
+# 1. Clone repository & create virtual environment
 git clone https://github.com/poruri-santhosh/Aislewise-2.git
 cd Aislewise-2
 
 python -m venv .venv
-# On Windows (PowerShell):
+# On Windows PowerShell:
 .venv\Scripts\Activate.ps1
 # On Linux / macOS:
 source .venv/bin/activate
-```
 
-### 2. Dependency Management
-```bash
+# 2. Install dependencies
 python -m pip install --upgrade pip setuptools wheel
 python -m pip install -r requirements.txt
 python -m pip install -r requirements-analysis.txt -r requirements-dev.txt -r streamlit/requirements.txt
-```
 
-### 3. Environment Configuration
-Create a `.env` file in the project root:
-```env
-DATABASE_URL="postgresql://<USER>:<PASSWORD>@<HOST>:5432/<DATABASE>?sslmode=require"
-NEON_DATABASE_URL="postgresql://<USER>:<PASSWORD>@<HOST>:5432/<DATABASE>?sslmode=require"
-AISLEWISE_WAREHOUSE_PATH="warehouse.duckdb"
-FLASK_SECRET_KEY="your-secret-key"
-```
+# 3. Configure environment variables in .env
+# DATABASE_URL="postgresql://<USER>:<PASSWORD>@<HOST>:5432/<DATABASE>?sslmode=require"
+# NEON_DATABASE_URL="postgresql://<USER>:<PASSWORD>@<HOST>:5432/<DATABASE>?sslmode=require"
+# AISLEWISE_WAREHOUSE_PATH="warehouse.duckdb"
+# FLASK_SECRET_KEY="your-secret-key"
 
-### 4. Database Migrations
-```bash
-python -c "import psycopg2, os; from dotenv import load_dotenv; load_dotenv(); conn = psycopg2.connect(os.getenv('DATABASE_URL') or os.getenv('NEON_DATABASE_URL')); cur = conn.cursor(); cur.execute(open('migrations/001_create_shopper_feedback.sql').read()); conn.commit(); cur.close(); conn.close(); print('Database schema initialized.')"
-```
+# 4. Run database migration
+python -c "import psycopg2, os; from dotenv import load_dotenv; load_dotenv(); conn = psycopg2.connect(os.getenv('DATABASE_URL') or os.getenv('NEON_DATABASE_URL')); cur = conn.cursor(); cur.execute(open('migrations/001_create_shopper_feedback.sql').read()); conn.commit(); cur.close(); conn.close(); print('Database schema initialized successfully.')"
 
-### 5. Launch Local Services
+# 5. Start Flask Storefront
+python app.py  # Accessible at http://127.0.0.1:5000
 
-#### Start Flask Storefront & REST API
-```bash
-python app.py
+# 6. Start Streamlit Dashboard (in a separate terminal)
+python -m streamlit run streamlit/app.py  # Accessible at http://localhost:8501
 ```
-* Accessible at: `http://127.0.0.1:5000`
-
-#### Start Streamlit Analytics Dashboard
-In a separate terminal, activate `.venv` and run:
-```bash
-python -m streamlit run streamlit/app.py
-```
-* Accessible at: `http://localhost:8501`
 
 ---
 
-## 11. Pipeline & Batch Workflows
+## 8. Pipeline Execution Workflows
+
+Execute offline extraction, database population, and analytical transformations in sequence:
 
 ```bash
 # Step 1: Download & parse UCSD Appliances dataset
@@ -395,7 +327,10 @@ python Scenario_C/scenario_c_audit.py
 
 ---
 
-## 12. API Reference & Contract Validation
+## 9. API Reference & Contract Validation
+
+<details>
+<summary><strong>📡 Click to expand: Endpoints & Request/Response Contracts</strong></summary>
 
 ### Contract Validation (`shopper_review_schema.py`)
 Incoming payloads to `/api/shopper-reviews` are converted to single-row DataFrames and validated against `ShopperReviewSchema`:
@@ -405,7 +340,7 @@ Incoming payloads to `/api/shopper-reviews` are converted to single-row DataFram
 * `dwell_time_seconds`: Float, minimum $0.0$.
 * `cart_items`: Python list of string identifiers.
 
-### Key Endpoints
+*(Note: Response examples below utilize illustrative synthetic test telemetry for demonstration purposes).*
 
 #### 1. System Health Check
 * **Endpoint:** `GET /health`
@@ -462,7 +397,7 @@ Incoming payloads to `/api/shopper-reviews` are converted to single-row DataFram
 * **Request Payload:**
   ```json
   {
-    "customer_name": "Santhosh Vardhan",
+    "customer_name": "Sample Shopper",
     "rating": 5,
     "review_text": "Navigated store aisles effortlessly, found all items.",
     "dwell_time_seconds": 184.5,
@@ -474,18 +409,17 @@ Incoming payloads to `/api/shopper-reviews` are converted to single-row DataFram
   {
     "status": "success",
     "feedback_id": 1,
-    "customer_name": "Santhosh Vardhan",
+    "customer_name": "Sample Shopper",
     "sentiment": "Positive",
     "sentiment_score": 0.9412,
     "message": "Shopper feedback successfully validated and recorded."
   }
   ```
+</details>
 
 ---
 
-## 13. Testing Suite
-
-The repository contains test suites validating application routes, error handling, and schema validation:
+## 10. Automated Testing
 
 ```bash
 # Run automated test suite
@@ -497,24 +431,22 @@ python -m pytest -q
 
 ---
 
-## 14. Deployment Guidelines
+## 11. Production Deployment
 
 ### Vercel Serverless (Storefront & Flask API)
 1. Link repository to Vercel with the project root set to repository root.
-2. Configure environment variables in Vercel project settings:
-   * `DATABASE_URL` or `NEON_DATABASE_URL`: Connection string to Neon PostgreSQL.
-   * `FLASK_SECRET_KEY`: Cryptographic secret key.
-3. Dependencies: Managed via `requirements.txt`. Heavy analytics libraries (`mlflow`, `streamlit`, `duckdb`) are omitted from root requirements to keep bundle size within serverless Lambda execution boundaries.
+2. Configure environment variables in Vercel project settings: `DATABASE_URL` / `NEON_DATABASE_URL` and `FLASK_SECRET_KEY`.
+3. Bundle Optimization: Root `requirements.txt` is kept minimal; heavy data packages (`mlflow`, `streamlit`, `duckdb`) are excluded to strictly honor the 500 MB Lambda limit.
 4. Entrypoint: `api/index.py` delegates execution to `app.py`.
 
 ### Streamlit Community Cloud (Analytics Dashboard)
 1. Link repository to Streamlit Community Cloud, targeting `streamlit/app.py`.
 2. Configure dependencies through `streamlit/requirements.txt`.
-3. Provide access to `warehouse.duckdb` via repository commit or cloud volume mount.
+3. Ensure `warehouse.duckdb` is present in the deployment root.
 
 ---
 
-## 15. Repository Topology
+## 12. Repository Topology
 
 ```
 Aislewise-2/
@@ -559,9 +491,16 @@ Aislewise-2/
 
 ---
 
-## 16. Author & License
+## 13. Author & Acknowledgements
 
 **Poruri Jayakara Santhosh Vardhan**  
-Specialization: AI/Machine Learning & Full-Stack Systems Engineering
+Specialization: AI/Machine Learning & Full-Stack Systems Engineering  
+* **GitHub:** [@poruri-santhosh](https://github.com/poruri-santhosh)  
+* **Project Repository:** [Aislewise-2](https://github.com/poruri-santhosh/Aislewise-2)
 
-Licensed under the Apache License 2.0. See the [LICENSE](LICENSE) file for details.
+### Acknowledgements
+* Amazon Reviews 2023 dataset by Julian McAuley Lab, University of California San Diego.
+* Open-source Python, PostgreSQL, DuckDB, scikit-learn, Flask, and Streamlit communities.
+
+### License
+This project is licensed under the Apache License 2.0. See the [LICENSE](LICENSE) file for details.
