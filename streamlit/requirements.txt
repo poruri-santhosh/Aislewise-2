@@ -11,3 +11,8 @@ gunicorn==23.0.0
 psycopg2-binary==2.9.13
 python-dotenv==1.2.3
 streamlit-autorefresh==1.0.1
+mlflow==3.18.0
+matplotlib==3.11.2
+seaborn==0.13.2
+tqdm==4.70.1
+pymongo==4.19.0
